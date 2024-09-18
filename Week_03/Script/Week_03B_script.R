@@ -408,14 +408,14 @@ plot1
 #
 
 
-### Homework... make a penguin plot! ###
+### Homework... let's make a penguin plot of our own! ###
+# I am choosing to build a box plot!
+# I will compare flipper length (mm) across species
 
-# build a box plot!
-# compare flipper length (mm) across species
-
-# quick view of the dataset
+# let's get quick view of the dataset.
 glimpse(penguins)
 
+# now, let's plot!
 ggplot(data = penguins, mapping = aes( x = species, 
                                        y = flipper_length_mm, 
                                        color = species, 
@@ -432,7 +432,8 @@ ggplot(data = penguins, mapping = aes( x = species,
 
 
 
-# Name plot to "plot3B"
+# now that we are happy with what we have built...
+# we shall assign a name to this plot to "plot3B"
 
 plot3B<- ggplot(data = penguins, mapping = aes( x = species, 
                                                 y = flipper_length_mm, 
