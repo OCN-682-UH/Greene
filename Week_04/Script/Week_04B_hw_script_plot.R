@@ -73,7 +73,7 @@ ggsave(here("Week_04", "Output", "Week_04B_hw_3.png"),
 
 
 # SAVE PLOT AS AN OBJECT (assign it a name)
-Week_04B_plot<-ggplot(ChemData_hw, 
+Week_04B_plot3<-ggplot(ChemData_hw, 
                        mapping = aes(x = Site, # my x value
                                      y = mean_sal, # my y value
                                      color = Time, # how I want to designate colors
@@ -89,4 +89,4 @@ Week_04B_plot<-ggplot(ChemData_hw,
         
 
 # view your plot
-Week_04B_plot
+Week_04B_plot3
