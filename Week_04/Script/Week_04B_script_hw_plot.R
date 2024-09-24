@@ -64,11 +64,11 @@ ggplot(ChemData_hw,
 
 
 # SAVE YOUR PLOT!
-ggsave(here("Week_04", "Output", "Week_04B_hw_3.png")) # save my plot into my output folder!
+ggsave(here("Week_04", "Output", "Week_04B_plot.png")) # save my plot into my output folder!
 
 
 # adjust the width and height of the plot (dimension of plot in inches)
-ggsave(here("Week_04", "Output", "Week_04B_hw_3.png"), 
+ggsave(here("Week_04", "Output", "Week_04B_plot.png"), 
        width = 18, height = 10)
 
 
