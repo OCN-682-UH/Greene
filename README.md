@@ -13,10 +13,10 @@ Each week has an associated folder, which includes the following:
 Much mahalos for dropping in to see my progress as I further explore data visualization! ^-^
 
 
-Kauanoe Greene
-Barton Lab
-Ph.D. in Botany, School of Life Science
-(808) 861-5523
-ajafaith@hawaii.edu
+Kauanoe Greene 
+
+Barton Lab, Ph.D. in Botany, School of Life Sciences
+
+(808) 861-5523/ajafaith@hawaii.edu
 
 
