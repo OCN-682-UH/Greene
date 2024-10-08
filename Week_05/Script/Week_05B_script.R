@@ -2,7 +2,7 @@
 ### INTRO ###
 ### Week_05B homework: lubridate dates and times ###
 ### Created by: Kauanoe Greene ###
-### Updated on: 2024-10-04 ###
+### Updated on: 2024-10-07 ###
 
 
 
@@ -166,12 +166,9 @@ DepthData_datetime<-DepthData %>%
 view(DepthData_datetime) # always check out your data after pipeing!
 
 # lubridate func task! join datasets 1 and dataset 2!
+# used inner_join so there are no NAs.
 
 datajoin<- inner_join(CondData_datetime, DepthData_datetime) 
-
-#left join cond and depth datasets! 
-# join_by datetime column since they overlap ;)
- 
 
 # stats task! calculate the mean values at each minute for depth, temp, and salinity!
 
@@ -179,26 +176,27 @@ datajoin<- inner_join(CondData_datetime, DepthData_datetime)
     select(datetime, Depth, Temperature, Salinity) %>% # choose which parameters you want to keep in your dataset to summarise.
     group_by(datetime) %>% # choose which how you want to group the mean by (we want it grouped by each minute)
     summarise(across(where(is.numeric), # calculate the mean of each numeric parameter listed and group by each minute
-                   list(mean =mean))) %>% 
-    pivot_longer(cols = Depth_mean:Salinity_mean, 
-                 names_to = "Parameters", 
-                 values_to = "Values")
+                   list(mean =mean))) %>% # list function allows us to rename the mean columns
+    pivot_longer(cols = Depth_mean:Salinity_mean, # reorient for facet wrap!
+                 names_to = "Parameters", # name of the parameter column
+                 values_to = "Values") %>% # name of value column
+    write_csv(here("Week_05", "Output", "Week_05B_hw.summary.csv")) #export as CSV.
   
 view(datajoin_mean) # check your data every time you pipe!
 
 # plot data!
+ggplot(data = datajoin_mean, # identify the data you want to plot
+       mapping = aes(x = datetime, # x axis variable
+                     y = Values, # y values!
+                     color = Parameters)) + # each parameter will be a different color
+  geom_line() + # line graph!
+  facet_wrap(vars(Parameters), scales = "free") + # face wrap! plot multiple parameters along one axis.
+  labs(title = "Variability in Depth, Salinity and Temperature Over Time", # plot tile
+       x = "Time", # x axis title
+       y = "Mean Values") + # y axis title
+  scale_color_viridis_d() # color scheme
 
-ggplot(data = datajoin_mean, 
-       mapping = aes(x = datetime, 
-                     y = Values)) + 
-  geom_line() + 
-  facet_wrap(vars(Parameters), scales = "free") +
-  labs(title = "Variability in Salinity and Temperature Over Time", 
-       x = "Time", 
-       y = "Mean Values") + 
-  scale_color_viridis_d()
-
-
-
+# SAVE YOUR PLOT!
+ggsave(here("Week_05", "Output", "Week_05B_plot.png")) # save my plot into my output folder!
 
 
