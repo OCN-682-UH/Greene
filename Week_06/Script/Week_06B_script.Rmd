@@ -1,0 +1,254 @@
+---
+title: '**Week 06B: Introduction to RMarkdown**'
+author: "Kauanoe Greene"
+date: "2024-10-08"
+output: 
+html_document:
+toc: TRUE
+toc_float: TRUE
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE, 
+                      fig.path = "../Output/")
+```
+
+
+# **Introduction**
+
+Introduction to RMarkdown using PalmerPenguins dataset!
+
+Datasets included:  
+- *Palmer Penguins Dataset*    
+- *Dr. Nyssa's Chemical Oceanography Dataset*  
+
+<!--
+Homework:
+- create at least one table
+- create one figure
+- knit the file
+- use any device you preference (pdf, html...)
+- headings with clear notes
+- practice bold/italics/lists
+- save outputs-->
+
+
+# **Packages**
+
+```{r}
+
+# install.packages("kableExtra")
+# install.packages("ymlthis")
+# install.packages("gtextras")
+# install.packages("DT")
+# install.packages("broom")
+
+```
+# **Libraries**
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(here)
+library(lubridate)
+library(ggthemes)
+library(ggplot2) 
+library(palmerpenguins) # dataset
+library(kableExtra) # kable tables
+library(pixiedust)
+library(DT)
+library(formattable)
+
+view(penguins)
+```
+
+<!-- check out the data -->
+
+```{r}
+glimpse(penguins)
+```
+# **Data**
+
+Data section includes data upload and data analyses of penguin and chemical datasets.
+
+#### *Palmer Penguins*
+
+<!-- pivot_longer so we can facet wrap and plot! -->
+
+```{r}
+penguins_long <- penguins %>% 
+  pivot_longer(cols = bill_length_mm:body_mass_g, 
+               names_to = "Parameters",
+               values_to = "Values") %>% 
+  drop_na()
+  
+view(penguins_long)
+```
+
+#### *Chemical Data*
+
+```{r data analyses}
+
+# read in cond data!
+# read in depth data!
+# check it out :)
+
+CondData<- read.csv(here("Week_06", "Data", "CondData.csv"))
+DepthData<- read.csv(here("Week_06", "Data", "DepthData.csv")) 
+
+glimpse(CondData) 
+glimpse(DepthData) 
+
+# formatting dataset 1: cond data
+# modify cond dataset so the datetime is in character format and matches depth dataset.
+# modify column name - date column to be "datetime" column
+# round the datetime format to round up to nearest 10 secs.
+# drop the NAs
+# select which parameters you want to include in dataset.
+# always check out your dataset after pipeing!
+
+CondData_datetime<-CondData %>% 
+  mutate(datetime = mdy_hm(date), 
+         datetime=round_date(datetime, "10 secs")) %>% 
+  drop_na() %>% 
+  select(datetime, Temperature, Serial, Salinity) 
+
+view(CondData_datetime) 
+
+
+# formatting dataset 2: depth data
+
+DepthData_datetime<-DepthData %>%
+  mutate(datetime = mdy_hm(date), 
+         datetime=round_date(datetime, "10 secs")) %>% 
+  drop_na() %>% 
+  select(datetime, AbsPressure, Depth)
+
+view(DepthData_datetime) 
+
+# always check out your data after pipeing!
+# lubridate func task! join datasets 1 and dataset 2!
+# used inner_join so there are no NAs.
+
+
+datajoin<- inner_join(CondData_datetime, DepthData_datetime) 
+
+# stats task! calculate the mean values at each minute for depth, temp, and salinity!
+# time to calculate the stats
+# choose which parameters you want to keep in your dataset to summarise.
+# choose which how you want to group the mean by (we want it grouped by each minute).
+# calculate the mean of each numeric parameter listed and group by each minute.
+# list function allows us to rename the mean columns.
+# reorient for facet wrap!
+# name of value column
+#export as CSV.
+
+
+  datajoin_mean <- datajoin %>% 
+    select(datetime, Depth, Temperature, Salinity) %>% 
+    group_by(datetime) %>% 
+    summarise(across(where(is.numeric), 
+                   list(mean =mean))) %>% 
+    pivot_longer(cols = Depth_mean:Salinity_mean, 
+                 names_to = "Parameters", 
+                 values_to = "Values") %>% 
+    write_csv(here("Week_06", "Output", "Week_06_hw.summary.csv")) 
+  
+view(datajoin_mean) 
+
+
+```
+
+# **Plot**
+
+Plot section includes practice penguin and chemical plots.
+
+#### *Palmer Penguins*
+
+```{r penguinplot, fig.align='center', fig.cap="This is a boxplot of penguin traits"}
+ggplot(data = penguins_long, 
+       mapping = aes(x = island, 
+                     y = Values, 
+                     fill = species)) + 
+  geom_boxplot() + 
+  facet_wrap(vars(Parameters), scales = "free") + 
+  labs(title = "Species Trait Variability Across Islands", 
+       subtitle = "Penguin species trait variability across Biscoe, Dream, and Torgersen Islands",
+       x = "Parameters",
+       y = "Values") + 
+  scale_color_viridis_d() + 
+  theme_classic()
+```
+
+#### *Chemical Data*
+
+```{r chemicalplot, fig.align='center', fig.cap="This is a boxplot of chemical oceanography data"}
+
+# plot data!
+# identify the data you want to plot
+# x axis variable
+# y values!
+# each parameter will be a different color.
+# line graph!
+# face wrap! plot multiple parameters along one axis.
+# plot tile
+# x axis title
+# y axis title
+# color scheme
+
+ggplot(data = datajoin_mean, 
+       mapping = aes(x = datetime, 
+                     y = Values, 
+                     color = Parameters)) + 
+  geom_line() + 
+  facet_wrap(vars(Parameters), scales = "free") + 
+  labs(title = "Variability in Depth, Salinity and Temperature Over Time", 
+       x = "Time", 
+       y = "Mean Values") + 
+  scale_color_viridis_d() 
+
+```
+
+# **Table**
+
+Table section include practice tables using kabel() function with both penguin and chemical datasets.
+#### *Palmer Penguins*
+
+<!--Practice table with kable!-->
+<!-- Practicing making my own kable! -->
+
+```{r}
+penguins_kbl <- penguins %>% 
+  pivot_longer(cols = bill_length_mm:body_mass_g, 
+               names_to = "Parameters",
+               values_to = "Values") %>% 
+  drop_na() %>% 
+  group_by(species, Parameters) %>% 
+  summarise(mean_values = mean(Values))
+
+view(penguins_kbl)
+
+penguins_kbl %>% 
+    kbl() %>% 
+    kable_classic() %>% 
+    kable_styling(full_width = TRUE)
+  
+  
+
+```
+
+#### *Chemical Data*
+
+```{r}
+
+# using a new package (formattable) to design a table using the chemical data.
+
+datajoin_mean %>% 
+    kbl() %>% 
+    kable_classic() %>% 
+    kable_styling(full_width = TRUE)
+
+```
+
