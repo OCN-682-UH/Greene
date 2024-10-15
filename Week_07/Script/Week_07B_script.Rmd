@@ -1,0 +1,213 @@
+---
+title: '**Week 07B: Introduction to Mapping Pt. II**'
+author: "Kauanoe Greene"
+date: "2024-10-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE, 
+                      fig.path = "../Output/")
+```
+
+# **Introduction**
+
+Introduction to plotting maps!
+
+Datasets included:
+- *Dr. Nyssa's Maunalua Chemical Oceanography Dataset*
+- *Tidy Tuesday -Meteorite Dataset*
+
+Homework:
+- not required, but you can make a map using a Tidy Tuesday dataset!
+- make sure you knit the html into your outputs, lol.
+
+
+# **Setting up Google and Stadia Maps**
+
+```{r map set up}
+
+# GOOGLE API MAP SETUP
+# for ggmaps
+# the setting "write = TRUE" will write the API key to your R environment so that you do not have to re-register it each time you code!
+# registered API key directly in console.
+
+if(!requireNamespace("devtools")) install.packages("devtools")
+
+devtools::install_github("dkahle/ggmap", ref = "tidyup", force = TRUE)
+```
+
+```{r}
+
+# GGMAP STADIAMAPS SETUP
+
+# install.packages("ggmap")
+# packageVersion("ggmap")
+# registered API directly in console.
+```
+
+# **Libraries and Packages**
+
+```{r message=FALSE, warning=FALSE}
+
+# LIBRARIES & PACKAGES
+library(tidyverse)
+library(here)
+library(lubridate)
+library(ggthemes)
+library(ggmap)
+library(ggplot2)
+library(ggspatial)
+library(maps)
+library(mapdata)
+library(mapproj)
+library(kableExtra)
+
+# install.packages("ggmap")
+# install.packages("ggspatial")
+```
+
+# **Data**
+
+```{r data upload}
+
+# DATA UPLOAD 
+
+# read in a dataset from tidytuesday
+# I chose meteorites.
+# read in maunalua chemical data for flipped lecture practice.
+
+meteorites <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-06-11/meteorites.csv")
+
+glimpse(meteorites)
+view(meteorites)
+
+ChemData <- read_csv(here("Week_07", "Data", "chemicaldata_maunalua.csv"))
+
+glimpse(ChemData)
+
+
+```
+
+```{r data}
+
+# DATA ANALYSES
+
+# API Google ggmaps
+
+# Oahu <- get_map("Oahu") # location as a string.named get_map "Oahu"
+
+# ggmap(Oahu) # use the ggmap function to plot it! it is like from google maps, lol.
+
+# WP <- data.frame(long = -157.7621, lat = 21.27427) # I can use coordinates to adjust the focal point of the map. You won't see the map yet, FYI.
+
+# Map1 <- get_map(WP) # get the base layer of the map. You still won't see the map, FYI.
+
+# ggmap(Map1) # plot it! Now, you can see the map :)
+
+# Map1 <- get_map(WP, zoom = 17) # now we can zooooooom in!
+
+# zoom argument ranges from 3-20. 3 is larger scale (like continental scale, while 20 is close scale kine). We are trying 17.
+
+# ggmap(Map1) # now, we can see the study site! it is sooo zoomed in. noice.
+
+# Map1 <- get_map(WP, zoom = 17, maptype = "satellite")
+# we changed the image format! Now, it is in satellite form, which looks much nicer. use the "?" function to see what other image types are available!
+
+# ggmap(Map1) # view the map
+
+
+# Stadia features
+# ran API key registration directly into the console.
+
+# Map1 <- get_map(WP, zoom = 17, maptype = "stamen_watercolor", source = "stadia")
+# a cute watercolor image format! but.. it did not work sadly. there was some error type. I must ask about it.
+
+# ggmap(Map1) # check it out
+
+
+# Satellite map stuff
+# Map1 <- get_map(WP, zoom = 17, maptype = "satellite") 
+# satellite map
+
+
+# plot points!
+
+# ggmap(Map1) + 
+  # geom_point(data = ChemData, # dataset
+             # aes(x = Long, y = Lat, color = Salinity), # axes and color points!
+             # size = 4) + # point size
+             # scale_color_viridis_c() + # color scheme
+  # annotation_scale(bar_cols = c("yellow", "white"), 
+                   # location = "bl") + # put the bar on the bottom left and make the colors yellow and white, please.
+                   # annotation_north_arrow(location = "tl") + # add a north arrow. "tl" means "top left".
+                     # coord_sf(crs = 4326) # for the scale bar to work it needs to be in this coordinate system - this is a typical coordinate reference system for a GPS map (WGS84). Otherwise, your scale units will be in centimeters.
+
+# Using geocode()!
+# Anything you can search in Google Maps can be applied to this geocode() function.
+# it will spit out lat and long of the desired location.
+
+# geocode("the white house")
+# geocode("University of Hawaii at Manoa")
+```
+
+
+```{r meteorplot, fig.align='center', fig.cap="This is a map capturing fallen meteors 2000-2010"}
+
+# My attempt to map meteorites!
+
+# Data upload
+world <- map_data("world") # world map
+glimpse(world) # check it out
+
+view(meteorites) # check out the variables to see what to plot.
+
+# Data analyses
+recent_meteorites <- meteorites %>% # create a new dataset
+  select(year, lat, long, mass, class) %>% # select desired variables.
+  filter(year >= 2000, 
+         year <= 2010) %>% # select for only meteors recorded from 2000-2010.
+  drop_na()  # drop the empty date cells.
+ 
+
+view(recent_meteorites) # view new dataset with filtered year.
+
+
+# Map plotting!
+ggplot() + # name my plot!
+  geom_polygon(data = world, # map the world.
+               aes(x = long, # x axis
+                   y = lat, # y axis
+                   group = group), # make it not look scraggly
+               fill = "gray") + # make it easier to see land.
+  guides(fill = FALSE) + # pretty sure these are outlines
+  coord_map(projection = "mercator", # cleaner map with coordinates.
+            xlim = c(-180, 180)) +  # map the map look nice.
+  geom_point(data = recent_meteorites, # add data points!
+             aes(x = long, # x axis
+                 y = lat, # y axis
+                 color = year)) + # select focal variable for color.
+  scale_fill_gradient(trans = "log10") + # make it look cleaner.
+  labs(title = "Fallen Meteorites of 2000-2010", # map title 
+       x = "Longitude", # x axis title
+       y = "Latitude") # y axis title
+```
+
+# **Table**
+
+```{r table}
+
+# make a little table
+
+meteor_kbl <- recent_meteorites # dataset
+view(meteor_kbl) # check it out
+
+meteor_kbl %>% # make a kable
+  kbl() %>% 
+  kable_styling(full_width = FALSE) # crop width 
+  
+```
+
+

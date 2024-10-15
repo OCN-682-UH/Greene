@@ -1,0 +1,151 @@
+---
+title: "Week_07A_script"
+author: "Kauanoe"
+date: "2024-10-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE, 
+                      fig.path = "../Output/")
+```
+
+
+# Packages
+
+```{r packages}
+# install.packages(c("maps", "mapproj", "mapdata"))
+
+```
+# Libraries
+
+```{r libraries}
+library(tidyverse)
+library(here)
+library(maps)
+library(mapdata)
+library(mapproj)
+```
+
+# Data
+
+```{r data}
+# read in data
+# view data
+
+stars<- read.csv(here("Week_07", "Data", "stars.csv"))
+CAPopdata<- read.csv(here("Week_07", "Data", "CAPopdata.csv"))
+chemicaldata_maunalua<- read.csv(here("Week_07", "Data", "chemicaldata_maunalua.csv"))
+
+glimpse(stars) 
+glimpse(CAPopdata)
+glimpse(chemicaldata_maunalua) 
+
+
+# map_data("location") is the function used to pull out whatever base layer that you want!
+# map_data is very american-centric
+# very coarse information
+
+world<-map_data("world")
+head(world)
+
+states<-map_data("state")
+
+counties<-map_data("county")
+head(counties)
+
+
+# make a world map
+# polygon fuction ("dataset", )
+
+ggplot() + 
+  geom_polygon(data = world, aes(x = long, y = lat, group = group))
+
+ggplot() + 
+  geom_polygon(data = world, aes(x = long, y = lat, group = group, 
+                                 fill = region), 
+               color = "black") + 
+  theme_minimal() +
+  guides(fill = FALSE) + 
+  theme(panel.background = element_rect(fill = "lightblue")) + 
+  coord_map(projection = "sinusoidal", 
+            xlim = c(-180,180))
+
+
+
+# map California!
+# use states data.
+# group = group prevents scissor mess for only polygons!
+# coord_mapp will prevent squishiness!!
+# theme_void makes floaty cali w/out lat/long
+
+head(states)
+
+CA_data <- states %>% 
+  filter(region == "california")
+
+ggplot() + 
+  geom_polygon(data = CA_data, aes(x = long, y = lat, group = group), fill = "lavender", color = "black") + 
+  theme_minimal() +
+  guides(fill = FALSE) + 
+  theme(panel.background = element_rect(fill = "lightblue")) + 
+  coord_map() + 
+  theme_void()
+
+
+# include counties and population data
+# look up janitor package to clean data
+# rename column and join county and population
+
+
+CApop_county <- CAPopdata %>% 
+  select("subregion" = County, Population) %>% 
+  inner_join(counties) %>% 
+  filter(region == "california")
+
+head(CApop_county)
+
+ggplot() + 
+  geom_polygon(data = CApop_county, 
+               aes(x = long, 
+                   y = lat, 
+                   group = group, 
+                   fill = Population), 
+               color = "black") + 
+  coord_map() + 
+  theme_void() + 
+  scale_fill_gradient(trans = "log10") # make it clearer
+
+
+# STARS
+# let us layer onto map with seastar data!!
+# add them as geom_points
+# change the aes to make the points visible!
+# used size argument
+
+
+head(stars)
+
+ggplot() + 
+  geom_polygon(data = CApop_county, 
+               aes(x = long, 
+                   y = lat, 
+                   group = group, 
+                   fill = Population), 
+               color = "black") + 
+  geom_point(data = stars, 
+             aes(x = long, 
+                 y = lat, 
+                 size = star_no)) + 
+  coord_map() + 
+  theme_void() + 
+  scale_fill_gradient(trans = "log10") + 
+  labs(size = "# stars/m2")
+
+ggsave(here("Week_07", "output", "CApop_map.pdf"))
+
+
+```
+
