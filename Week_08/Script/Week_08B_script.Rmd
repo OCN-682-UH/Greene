@@ -1,0 +1,227 @@
+---
+title: 'Week 8B: Advanced Plotting'
+author: "Kauanoe Greene"
+date: "2024-10-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE, 
+                      fig.path = "../Output/")
+```
+
+```{r}
+# Packages
+# install.packages("patchwork") # bring plots tgthr
+# install.packages("ggrepel") # repel labels
+# install.packages("gganimate") # animations
+# install.packages("magick") # images
+```
+
+```{r}
+# Libraries
+library(tidyverse)
+library(here)
+library(patchwork)
+library(ggrepel)
+library(gganimate)
+library(magick)
+library(palmerpenguins)
+```
+
+```{r}
+# Patchwork: bring plots together!
+# practice with PalmerPenguins
+
+view(penguins)
+
+# Plot 1
+p1 <- penguins %>% 
+  ggplot(aes(x = body_mass_g, 
+             y = bill_length_mm, 
+             color = species)) + 
+  geom_point()
+
+p1
+```
+
+```{r}
+# Patchwork practice
+# Plot 2
+
+p2 <- penguins %>% 
+  ggplot(aes(x = sex, 
+             y = body_mass_g, 
+             color = species)) + 
+  geom_jitter(width = 0.2)
+
+p2
+```
+
+```{r}
+# Patchwork IN ACTTTIONN
+
+p1+p2 + 
+  plot_layout(guides = 'collect') + # group the legends.
+  plot_annotation(tag_levels = 'A') # add labels (A,B)
+
+```
+
+```{r}
+# Patchwork - put one plot on top of the other!
+
+p1/p2 + 
+  plot_layout(guides = 'collect') + # guides is "legend", collect combines the legend i think.
+  plot_annotation(tag_levels = 'A')
+```
+
+```{r}
+# ggrepel: easy and clear labels for plots!
+# using the mtcars dataset
+
+view(mtcars)
+
+ggplot(mtcars, aes(x = wt, 
+                   y = mpg, 
+                   label = rownames(mtcars))) + 
+  geom_text() + # creates a text label
+  geom_point(color = 'red')
+
+```
+
+```{r}
+# repel the labels
+
+ggplot(mtcars, aes(x = wt, 
+                   y = mpg, 
+                   label = rownames(mtcars))) + 
+  geom_text_repel() + # repel the text.
+  geom_point(color = 'red')
+
+```
+
+```{r}
+# repel the labels using the label function.
+
+ggplot(mtcars, aes(x = wt, 
+                   y = mpg, 
+                   label = rownames(mtcars))) + 
+  geom_label_repel() + # repel the text.
+  geom_point(color = 'red')
+```
+
+
+```{r}
+# gganimate: make animations!
+# animate the palmer penguin figure by year.
+
+# step 1: plot data to animate
+penguins %>% 
+  ggplot(aes(x = body_mass_g, 
+             y = bill_depth_mm, 
+             color = species)) + 
+  geom_point()
+
+```
+
+```{r}
+# step 2: transitions
+penguins %>% 
+  ggplot(aes(x = body_mass_g, 
+             y = bill_depth_mm, 
+             color = species)) + 
+  geom_point() + 
+  transition_states( 
+    year, # what we want to animate
+    transition_length = 2, # the relative length of the transition.
+    state_length = 1 # the length of the pause between transitions.
+  )
+```
+
+```{r}
+# step 3: ease
+penguins %>% 
+  ggplot(aes(x = body_mass_g, 
+             y = bill_depth_mm, 
+             color = species)) + 
+  geom_point() + 
+  transition_states( 
+    year, # what we want to animate
+    transition_length = 2, # the relative length of the transition.
+    state_length = 1 # the length of the pause between transitions.
+  ) + 
+  ease_aes("bounce-in-out") # change the ease of aesthetics. examples include: linear (default), bounce, sine, circular...
+
+```
+
+```{r}
+# step 4: transition title
+penguins %>% 
+  ggplot(aes(x = body_mass_g, 
+             y = bill_depth_mm, 
+             color = species)) + 
+  geom_point() + 
+  transition_states( 
+    year, # what we want to animate
+    transition_length = 2, # the relative length of the transition.
+    state_length = 1 # the length of the pause between transitions.
+  ) + 
+  ease_aes("bounce-in-out") + 
+  labs(title = 'Year: {closest_state}') #itll show the years change in the title.
+```
+
+```{r}
+# step 5: save it as a gif!!
+penguins %>% 
+  ggplot(aes(x = body_mass_g, 
+             y = bill_depth_mm, 
+             color = species)) + 
+  geom_point() + 
+  transition_states( 
+    year, # what we want to animate
+    transition_length = 2, # the relative length of the transition.
+    state_length = 1 # the length of the pause between transitions.
+  ) + 
+  ease_aes("bounce-in-out") + 
+  labs(title = 'Year: {closest_state}') + 
+  anim_save(here("Week_08", "Output", "mypenguingif.gif"))
+```
+```{r}
+# magick: advanced image processing
+# penguin photos
+penguin <- image_read("https://th.bing.com/th/id/OIP.Z49LYmg8H6OZApxau131tQHaE8?rs=1&pid=ImgDetMain")
+
+penguin
+
+```
+
+```{r}
+penguins %>% 
+  ggplot(aes(x = body_mass_g, 
+             y = bill_length_mm, 
+             color = species)) + 
+  geom_point()
+
+ggsave(here("Week_08", "Output", "penguinplot.png")) # save plot to output folder.
+```
+
+```{r}
+penplot <- image_read(here("Week_08", "Output", "penguinplot.png"))
+
+out <- image_composite(penplot, penguin, offset = "+70+30")
+
+out
+```
+
+```{r}
+pengif <- image_read("https://media.giphy.com/media/Cmr1OMJ2FN0B2/giphy.gif")
+
+outgif <- image_composite(penplot, pengif, gravity = "center")
+
+animation <- image_animate(outgif, fps = 10, optimize = TRUE)
+
+animation
+```
+

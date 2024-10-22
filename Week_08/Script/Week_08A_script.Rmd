@@ -1,0 +1,173 @@
+---
+title: "Week_08A_script"
+author: "Kauanoe Greene"
+date: "2024-10-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Packages
+install.packages("tidytext")
+install.packages("wordcloud2")
+install.packages("janeaustenr")
+install.packages("stopwords")
+
+# Libraries
+library(here)
+library(tidyverse)
+library(tidytext)
+library(wordcloud2)
+library(janeaustenr)
+```
+
+```{r}
+
+# MANIPULATION!
+
+paste("High temp", "Low pH") # combines words.
+paste("High temp", "Low pH", sep = "-") # seperate by heiphen.
+paste0("High temp", "Low pH") # remove space when combining words.
+
+shapes <- c("Square", "Circle", "Triangle")
+paste("My favorite shape is a", shapes)
+
+two_cities <- c("best", "worst")
+paste("it was the", two_cities, "of times")
+
+
+```
+
+```{r}
+
+# WHITESPACE
+
+badtreatments <- c("High", " High", "High ", "Low", "Low")
+badtreatments
+
+str_trim(badtreatments) # gets rid of the extra spaces arounf "High" that make it a distinct character.
+
+str_pad(badtreatments, 5, side = "right") # fills in whitespaces to the "right" side so they all equal "5" characters
+
+str_pad(badtreatments, 5, side = "right", pad = "1") # fills in whitespaces to the "right" side so they all equal "5" characters, but now with "1"
+
+```
+
+```{r}
+
+# LOCALE SENSITIVE
+
+x <- "I love R!"
+str_to_upper(x) # make it all upper case!
+
+str_to_title(x) # title case (upper case first letter of each word)
+```
+
+```{r}
+
+# PATTERN MATCH
+
+data <- c("AAA", "TATA", "CTAG", "GCTT")
+str_view(data, pattern = "A") # show me the "A" patterns across the data!
+
+str_detect(data, pattern = "AT") # tells me true/false if the pattern is detected in the dataset!!
+
+str_locate(data, pattern = "AT") # tells me where the pattern is detected!
+
+```
+
+```{r}
+
+# regrex: REGULAR EXPRESSIONS
+
+
+# METACHARACTERS
+
+vals <- c("a.b", "b.c", "c.d")
+str_replace(vals, "\\.", " ") # i want to replace the period with a space. which is the " "
+
+vals <- c("a.b.c", "b.c.d", "c.d.e")
+str_replace_all(vals, "\\.", " ")
+
+# SEQUENCES (i am too slow to note)
+
+# find the phone numbers
+
+strings <- c("550-153-7578", 
+             "banana", 
+             "435.114.7586", 
+             "home: 672-442-6739")
+
+phone <- "([2-9][0-9]{2})[-.]([0-9]{3})[-.]([0-9]{4})"
+
+str_detect(strings, phone) # which strings contain phone numbers?
+
+
+# think, pair share: get rid of non-numbers, 
+test %>% str_replace_all(pattern = "\\.", replacement = "-") %>%
+  str_replace_all(pattern = "[a-zA-Z]|\\:", replacement = " ") %>% 
+  str_trim()
+
+
+```
+```{r}
+
+# TIDYTEXT
+
+head(austen_books()) # check it out, but do not open it bc it'll freak your laptop out.
+
+original_books <- austen_books() %>% # get all of Jane Austen's books
+  group_by(book) %>% 
+  mutate(line = row_number(), # find every line
+         chapter = cumsum(str_detect(text, regex("^chapter [\\divxlc]", # count the chapters (starts with the word chapter followed by a digit or roman numeral)
+                                                 ignore_case = TRUE)))) %>% #ignore lower or uppercase
+  ungroup() # ungroup it so we have a dataframe again
+# don't try to view the entire thing... its >73000 lines...
+head(original_books)
+
+tidy_books <- original_books %>%
+  unnest_tokens(output = word, input = text) # add a column named word, with the input as the text column
+head(tidy_books) # there are now >725,000 rows. Don't view the entire thing!
+
+#see an example of all the stopwords
+head(get_stopwords())
+
+cleaned_books <- tidy_books %>%
+  anti_join(get_stopwords()) # dataframe without the stopwords
+
+head(cleaned_books)
+
+cleaned_books %>%
+  count(word, sort = TRUE) # top ten used words across her writings.
+
+sent_word_counts <- tidy_books %>%
+  inner_join(get_sentiments()) %>% # only keep pos or negative connotative words
+  count(word, sentiment, sort = TRUE) # count them
+head(sent_word_counts)[1:3,]
+
+
+# Plot it!
+
+sent_word_counts %>%
+  filter(n > 150) %>% # take only if there are over 150 instances of it
+  mutate(n = ifelse(sentiment == "negative", -n, n)) %>% # add a column where if the word is negative make the count negative
+  mutate(word = reorder(word, n)) %>% # sort it so it gows from largest to smallest
+  ggplot(aes(word, n, fill = sentiment)) +
+  geom_col() +
+  coord_flip() +
+  labs(y = "Contribution to sentiment")
+
+# WORDCLOUDDDD
+
+words<-cleaned_books %>%
+  count(word) %>% # count all the words
+  arrange(desc(n))%>% # sort the words
+  slice(1:100) #take the top 100
+wordcloud2(words, shape = 'triangle', size=0.3) # make a wordcloud out of the top 100 words
+
+
+```
+
