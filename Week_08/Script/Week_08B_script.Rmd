@@ -19,6 +19,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(palmerpenguins)
 library(PNWColors)
+library(here)
 ```
 # Danielle's Lecture
 
@@ -279,12 +280,13 @@ multiplybytwo(177)
 
 
 
-```{r}
+```{r plot}
 # Function with a plot!
 
 # Let us looks at our data set
 
-glimpse(means)
+cleandata<-read_csv(here("Week_08", "Data", "cleandata.csv"))
+view(cleandata)
 
 # Here is a plot with my conductance data
 # I have made it into a function
@@ -296,13 +298,20 @@ ggplot(data, aes(x = {{x}}, y = {{y}} , color = Population)) + geom_point() +
 }
 
 # Let us test it with conductance data
-myplot(dat = means, x = Week, y = mean.cond )
+myplot(dat = cleandata, x = Week, y = Conductance)
+
+# save my plot to my output folder
+ggsave(here("Week_08", "Output", "conplot.png"))
+
 ```
 
 
 ```{r}
 # One more test with chlorophyll data
-myplot(dat = means, x = Week, y = mean.chl)
+myplot(dat = cleandata, x = Week, y = Chlorophyll)
+
+# save my plot to my output folder
+ggsave(here("Week_08", "Output", "chlplot.png")) 
 ```
 
 
