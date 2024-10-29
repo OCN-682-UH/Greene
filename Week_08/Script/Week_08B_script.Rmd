@@ -9,6 +9,8 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Libraries
+
 ```{r}
 # Packages
 # install.packages(PNWColors)
@@ -18,6 +20,7 @@ library(tidyverse)
 library(palmerpenguins)
 library(PNWColors)
 ```
+# Danielle's Lecture
 
 ```{r}
 
@@ -235,12 +238,71 @@ myplot(x = body_mass_g, y = flipper_length_mm)
 myplot(x = body_mass_g, y = flipper_length_mm, lines = FALSE)
 ```
 
+# Homework
+
 ```{r}
 
-# HOMEWORK
+# HOMEWORK INSTRUCTIONS
 # Use any dataset you would like and make two useful functions. 
 # One that is a plot and one that is not. Turn in your functions using RMarkdown with at least 2 examples per function showing its flexibility. Due, as always, at 1pm on Tuesday.
 
+```
+
+```{r}
+# Function without a plot
+
+# Steps to create a new function!
+# 1. pick a name for the new function: "meanconductance"
+# 2. list inputs or arguments (example: (x, y, z))
+# 3. place code in body of the function (a block that immediately follows the function(...)) curly brackets?
+# return tells us what values we want returned when you run the function
+
+# Let us make a function that multiplies the given value by 2!
+# pick a name: multiply by two
+# equation: doublevalue <- (value * 2)
+
+multiplybytwo <- function(value) { 
+  doublevalue <- (value * 2)
+  return(doublevalue)}
+
+# Test it
+multiplybytwo(45)
+
+# Noice!
+```
+
+```{r}
+# One more example to demonstrate its flexibility
+
+multiplybytwo(177)
+```
+
+
+
+```{r}
+# Function with a plot!
+
+# Let us looks at our data set
+
+glimpse(means)
+
+# Here is a plot with my conductance data
+# I have made it into a function
+
+myplot<-function(data, x, y){ # setting up the function
+
+ggplot(data, aes(x = {{x}}, y = {{y}} , color = Population)) + geom_point() +
+  theme_bw()
+}
+
+# Let us test it with conductance data
+myplot(dat = means, x = Week, y = mean.cond )
+```
+
+
+```{r}
+# One more test with chlorophyll data
+myplot(dat = means, x = Week, y = mean.chl)
 ```
 
 
