@@ -1,227 +1,246 @@
 ---
-title: 'Week 8B: Advanced Plotting'
+title: 'Week 08B: Functional Programming'
 author: "Kauanoe Greene"
 date: "2024-10-22"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, 
-                      message = FALSE, 
-                      warning = FALSE, 
-                      fig.path = "../Output/")
+knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
 # Packages
-# install.packages("patchwork") # bring plots tgthr
-# install.packages("ggrepel") # repel labels
-# install.packages("gganimate") # animations
-# install.packages("magick") # images
-```
+# install.packages(PNWColors)
 
-```{r}
 # Libraries
 library(tidyverse)
-library(here)
-library(patchwork)
-library(ggrepel)
-library(gganimate)
-library(magick)
 library(palmerpenguins)
+library(PNWColors)
 ```
 
 ```{r}
-# Patchwork: bring plots together!
-# practice with PalmerPenguins
 
-view(penguins)
-
-# Plot 1
-p1 <- penguins %>% 
-  ggplot(aes(x = body_mass_g, 
-             y = bill_length_mm, 
-             color = species)) + 
-  geom_point()
-
-p1
+df <- tibble( 
+            a = rnorm(10), 
+            b = rnorm(10), 
+            c = rnorm(10), 
+            d = rnorm(10))
+head(df)
 ```
 
 ```{r}
-# Patchwork practice
-# Plot 2
 
-p2 <- penguins %>% 
-  ggplot(aes(x = sex, 
-             y = body_mass_g, 
-             color = species)) + 
-  geom_jitter(width = 0.2)
+df <- df %>% 
+  mutate(a = (a-min(a, na.rm = TRUE))/(max(a, na.rm = TRUE)-min(a, na.rm = TRUE)))
 
-p2
+# be careful of mistakes
+
+df <- df %>%
+  mutate(a = (a-min(a, na.rm = TRUE))/(max(a, na.rm = TRUE)-min(a, na.rm = TRUE)),
+         b = (b-min(b, na.rm = TRUE))/(max(b, na.rm = TRUE)-min(b, na.rm = TRUE)),
+         c = (c-min(c, na.rm = TRUE))/(max(c, na.rm = TRUE)-min(c, na.rm = TRUE)),
+         d = (d-min(d, na.rm = TRUE))/(max(d, na.rm = TRUE)-min(d, na.rm = TRUE)))
+
+# rescale
+# let us write a function for this!
+
+rescale01 <- function(x) {
+  value<-(x-min(x, na.rm = TRUE))/(max(x, na.rm = TRUE)-min(x, na.rm = TRUE))
+  return(value)
+}
+
+df %>%
+  mutate(a = rescale01(a),
+         b = rescale01(b),
+         c = rescale01(c),
+         d = rescale01(d))
 ```
 
 ```{r}
-# Patchwork IN ACTTTIONN
+# steps to create a new function
 
-p1+p2 + 
-  plot_layout(guides = 'collect') + # group the legends.
-  plot_annotation(tag_levels = 'A') # add labels (A,B)
-
-```
-
-```{r}
-# Patchwork - put one plot on top of the other!
-
-p1/p2 + 
-  plot_layout(guides = 'collect') + # guides is "legend", collect combines the legend i think.
-  plot_annotation(tag_levels = 'A')
-```
-
-```{r}
-# ggrepel: easy and clear labels for plots!
-# using the mtcars dataset
-
-view(mtcars)
-
-ggplot(mtcars, aes(x = wt, 
-                   y = mpg, 
-                   label = rownames(mtcars))) + 
-  geom_text() + # creates a text label
-  geom_point(color = 'red')
-
-```
-
-```{r}
-# repel the labels
-
-ggplot(mtcars, aes(x = wt, 
-                   y = mpg, 
-                   label = rownames(mtcars))) + 
-  geom_text_repel() + # repel the text.
-  geom_point(color = 'red')
-
-```
-
-```{r}
-# repel the labels using the label function.
-
-ggplot(mtcars, aes(x = wt, 
-                   y = mpg, 
-                   label = rownames(mtcars))) + 
-  geom_label_repel() + # repel the text.
-  geom_point(color = 'red')
-```
+# 1. pick a name for the new function (example: "rescale01")
+# 2. list inputs or arguments (example: (x, y, z))
+# 3. place code in body of the function (a block that immediately follows the function(...)) curly brackets?
+# return tells us what values we want returned when you run the function
 
 
-```{r}
-# gganimate: make animations!
-# animate the palmer penguin figure by year.
+rescale01 <- function(x) {
+  value<-(x-min(x, na.rm = TRUE))/(max(x, na.rm = TRUE)-min(x, na.rm = TRUE))
+  return(value)
+}
 
-# step 1: plot data to animate
-penguins %>% 
-  ggplot(aes(x = body_mass_g, 
-             y = bill_depth_mm, 
-             color = species)) + 
-  geom_point()
+# 1. what is the func calculation!
+# temp_C <- (temp_F - 32) * 5 / 9
+
+# 2. name it!
+# fahrenheit_to_celsius <- function() {}
+fahrenheit_to_celsius <- function() { 
+  temp_C <- (temp_F - 32) * 5 / 9
+}
+
+# 3. decide arguments
+fahrenheit_to_celsius <- function(temp_F) {
+  temp_C <- (temp_F - 32) * 5 / 9 
+}
+
+# 4. what is being returned?
+fahrenheit_to_celsius <- function(temp_F) { 
+  temp_C <- (temp_F - 32) * 5 / 9 
+  return(temp_C)
+}
+
+# 5. TEST IT
+fahrenheit_to_celsius(32)
+fahrenheit_to_celsius(212)
+
+# Think, pair, share!
+# write a function converting celcius to kelvin
+# kelvin is celcius + 273.15
+
+
+
 
 ```
 
 ```{r}
-# step 2: transitions
-penguins %>% 
-  ggplot(aes(x = body_mass_g, 
-             y = bill_depth_mm, 
-             color = species)) + 
-  geom_point() + 
-  transition_states( 
-    year, # what we want to animate
-    transition_length = 2, # the relative length of the transition.
-    state_length = 1 # the length of the pause between transitions.
-  )
+# making plots into a function
+
+pal <- pnw_palette("Lake", 3, type = "discrete")
+
+ggplot(penguins, aes(x = body_mass_g, y = bill_length_mm, color = island))+
+  geom_point()+
+  geom_smooth(method = "lm")+ # add a linear model
+  scale_color_manual("Island", values=pal)+   # use pretty colors and another example of how to manually change the legend title for colors
+  theme_bw()
 ```
 
 ```{r}
-# step 3: ease
-penguins %>% 
-  ggplot(aes(x = body_mass_g, 
-             y = bill_depth_mm, 
-             color = species)) + 
-  geom_point() + 
-  transition_states( 
-    year, # what we want to animate
-    transition_length = 2, # the relative length of the transition.
-    state_length = 1 # the length of the pause between transitions.
-  ) + 
-  ease_aes("bounce-in-out") # change the ease of aesthetics. examples include: linear (default), bounce, sine, circular...
+myplot<-function(data, x, y){
 
+pal<-pnw_palette("Lake",3, type = "discrete") # color palette 
+
+ggplot(data, aes(x = {{x}}, y = {{y}} , color = island))+
+  geom_point()+
+  geom_smooth(method = "lm")+ # add a linear model
+  scale_color_manual("Island", values = pal)+   # use pretty colors and change the legend title
+  theme_bw()
+}
+
+myplot(dat = penguins, x = body_mass_g, y = bill_length_mm)
 ```
 
 ```{r}
-# step 4: transition title
-penguins %>% 
-  ggplot(aes(x = body_mass_g, 
-             y = bill_depth_mm, 
-             color = species)) + 
-  geom_point() + 
-  transition_states( 
-    year, # what we want to animate
-    transition_length = 2, # the relative length of the transition.
-    state_length = 1 # the length of the pause between transitions.
-  ) + 
-  ease_aes("bounce-in-out") + 
-  labs(title = 'Year: {closest_state}') #itll show the years change in the title.
-```
+# testing plot with new variables
 
-```{r}
-# step 5: save it as a gif!!
-penguins %>% 
-  ggplot(aes(x = body_mass_g, 
-             y = bill_depth_mm, 
-             color = species)) + 
-  geom_point() + 
-  transition_states( 
-    year, # what we want to animate
-    transition_length = 2, # the relative length of the transition.
-    state_length = 1 # the length of the pause between transitions.
-  ) + 
-  ease_aes("bounce-in-out") + 
-  labs(title = 'Year: {closest_state}') + 
-  anim_save(here("Week_08", "Output", "mypenguingif.gif"))
-```
-```{r}
-# magick: advanced image processing
-# penguin photos
-penguin <- image_read("https://th.bing.com/th/id/OIP.Z49LYmg8H6OZApxau131tQHaE8?rs=1&pid=ImgDetMain")
-
-penguin
+myplot(data = penguins, x = body_mass_g, y = flipper_length_mm)
 
 ```
 
 ```{r}
-penguins %>% 
-  ggplot(aes(x = body_mass_g, 
-             y = bill_length_mm, 
-             color = species)) + 
-  geom_point()
+# Defaults!
+# adding defaults so you do not have to state the arguments again.
+# we just need to specify x and y
 
-ggsave(here("Week_08", "Output", "penguinplot.png")) # save plot to output folder.
+myplot<-function(data = penguins, x, y){
+
+pal<-pnw_palette("Lake",3, type = "discrete") # my color palette 
+
+ggplot(data, aes(x = {{x}}, y = {{y}} , color = island))+
+  geom_point()+
+  geom_smooth(method = "lm")+ # add a linear model
+  scale_color_manual("Island", values = pal)+   # use pretty colors and change the legend title
+  theme_bw()
+}
+
+# view plot
+myplot(x = body_mass_g, y = flipper_length_mm)
 ```
 
 ```{r}
-penplot <- image_read(here("Week_08", "Output", "penguinplot.png"))
+# Layers!
+# layering the plot
+# spice up the plot ^_^
 
-out <- image_composite(penplot, penguin, offset = "+70+30")
-
-out
+myplot(x = body_mass_g, y = flipper_length_mm)+
+  labs(x = "Body mass (g)",
+       y = "Flipper length (mm)")
 ```
 
 ```{r}
-pengif <- image_read("https://media.giphy.com/media/Cmr1OMJ2FN0B2/giphy.gif")
+# if-else!
+# different conditions
+# statements that allow you to have one or another outcome.
 
-outgif <- image_composite(penplot, pengif, gravity = "center")
+a <- 4
+b <- 5
 
-animation <- image_animate(outgif, fps = 10, optimize = TRUE)
+if (a > b) { # my question
+  f <- 20 # if it is true give me answer 1
+    } else { # else give me answer 2
+  f <- 10
+    }
 
-animation
+f
 ```
+```{r}
+# back to plotting
+
+myplot<-function(data = penguins, x, y ,lines=TRUE ){ # add new argument for lines
+
+pal<-pnw_palette("Lake",3, type = "discrete") # my color palette 
+
+ggplot(data, aes(x = {{x}}, y = {{y}} , color = island))+
+  geom_point()+
+  geom_smooth(method = "lm")+ # add a linear model
+  scale_color_manual("Island", values=pal)+   # use pretty colors and change the legend title
+  theme_bw()
+}
+
+
+# add the if-else statement now to the plot!
+
+myplot<-function(data = penguins, x, y, lines=TRUE ){ # add new argument for lines
+
+pal<-pnw_palette("Lake",3, type = "discrete") # my color palette 
+if(lines==TRUE){
+
+  ggplot(data, aes(x = {{x}}, y = {{y}} , color = island))+
+  geom_point()+
+  geom_smooth(method = "lm")+ # add a linear model
+  scale_color_manual("Island", values=pal)+   # use pretty colors and change the legend title
+  theme_bw()
+}
+else{
+ggplot(data, aes(x = {{x}}, y = {{y}} , color = island))+
+  geom_point()+
+  scale_color_manual("Island", values=pal)+   # use pretty colors and change the legend title
+  theme_bw()
+}
+}
+
+# test it!
+
+# with lines
+myplot(x = body_mass_g, y = flipper_length_mm)
+
+```
+
+```{r}
+
+# test the plot, again!
+# without (geom_smooth) lines
+
+myplot(x = body_mass_g, y = flipper_length_mm, lines = FALSE)
+```
+
+```{r}
+
+# HOMEWORK
+# Use any dataset you would like and make two useful functions. 
+# One that is a plot and one that is not. Turn in your functions using RMarkdown with at least 2 examples per function showing its flexibility. Due, as always, at 1pm on Tuesday.
+
+```
+
 
