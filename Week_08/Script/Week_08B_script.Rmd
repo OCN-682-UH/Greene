@@ -21,6 +21,7 @@ library(palmerpenguins)
 library(PNWColors)
 library(here)
 ```
+
 # Danielle's Lecture
 
 ```{r}
