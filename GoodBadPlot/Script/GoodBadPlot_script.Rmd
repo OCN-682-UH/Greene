@@ -41,6 +41,7 @@ knitr::opts_chunk$set(echo = TRUE,
 
 library(tidyverse) # for plotting
 library(here) # for saving data
+library(ggimage) # for plot image background
 
 ```
 
@@ -97,7 +98,8 @@ Let us take our datasheet and put together a plot of poor quality (based on Wilk
 
 
 Bad plot qualities:  
-- Distracting title color
+
+- Distracting title and axis text colors
 - Format is unorganized and messy  
 - Title text size is too small - difficult to read  
 - No x-axis label  
@@ -105,10 +107,11 @@ Bad plot qualities:
 - y-axis label is bold  
 - title text is not bold  
 - Spelling errors in title text and y-axis label text  
-- Distracting panel and plot colors - difficult to read   
+- Distracting plot background image - difficult to read   
 - Data points are not clear and are too rigid  
 - Absences of units for all plotted data    
 - No legend present  
+- No major and minor gridlines  
 - Overall, this plot does not clearly capture and communicate results!  
 
 
@@ -125,15 +128,17 @@ badconductanceplot <- means %>% #datasheet
        x = "", # x-axis label
        y = "mea ns") + # y-axis label
   ggtitle("conductence") + # plot title
-  theme(plot.background = element_rect(fill = "green"), # plot background color
-        panel.background = element_rect(fill = "green"), # panel background color
-        plot.title = element_text(size = 10, color = "darkgreen"), # bold title and color font
-        axis.text.x = element_text(size = 5), axis.title.x = element_text(size = 10), # adjust x-axis labels
-        axis.text.y = element_text(size = 5, face = "bold"), axis.title.y = element_text(size = 20),   # adjust y-axis labels
+  theme(plot.title = element_text(size = 10, color = "red"), # bold title and color font
+        axis.text.y = element_text(size = 5, face = "bold", color = "blue"), axis.title.y = element_text(size = 20, color = "yellow", face = "bold"),   # adjust y-axis labels
         panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(), 
         panel.border = element_blank(), 
         legend.position = "none")
+
+# upload image for plot background photo
+url <- "https://th.bing.com/th/id/R.88a1265ce687180cf3304086de167fa8?rik=8ZXxBDEELVZGxw&riu=http%3a%2f%2fupload.wikimedia.org%2fwikipedia%2fcommons%2f9%2f9d%2fPear_Leaf.jpg&ehk=6oQYxWuB%2bDA0uClCNGOP0zRNFDm6NkyKb53YYJyAnfM%3d&risl=&pid=ImgRaw&r=0"
+
+badconductanceplot <- ggbackground(badconductanceplot, url) # add image to plot
 
 # save plot
 ggsave(here("GoodBadPlot", "Output", "badconductanceplot.png")) # save my plot into my output folder!
@@ -151,8 +156,9 @@ badconductanceplot
 - We will refer to Wilkes & Healy's standards for guidance  
 
 
-Good plot qualities:
-- Captures and communicates data well    
+Good plot qualities:  
+
+- Captures and communicates data well      
 - No spelling errors  
 - Units are described for all plotted data  
 - Format theme is organized, clear, and clean  
