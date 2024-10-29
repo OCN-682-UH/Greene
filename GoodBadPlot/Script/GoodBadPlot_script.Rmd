@@ -4,8 +4,6 @@ author: "Kauanoe Greene"
 date: "2024-10-28"
 output: 
 html_document:
-toc: TRUE
-toc_float: TRUE
 ---
   
   
