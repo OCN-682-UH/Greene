@@ -1,8 +1,11 @@
 ---
-title: 'Week_09B: Working with Factors'
+title: 'Week 09B: Working with Factors'
 author: "Kauanoe Greene"
 date: "2024-10-31"
-output: html_document
+output: 
+  github_document:
+    toc: TRUE
+  
 ---
 
 ```{r setup, include=FALSE}
@@ -16,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE,
 ```
 
 # Libraries  
-```{r}
+```{r Libraries}
 
 # Packages
 # install.packages("forcats")
@@ -32,9 +35,9 @@ library(viridis)
 
 ```
 
-# Data  
+# Data: 9B Flipped Lecture 
 
-```{r}
+```{r Data}
 # DATA
 
 # Data upload
@@ -44,7 +47,10 @@ library(viridis)
 
 income_mean <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-02-09/income_mean.csv')
 ```
-```{r}
+
+# Intro to Factors  
+
+```{r Intro to Factors}
 
 # FACTORS
 
@@ -129,7 +135,6 @@ star_counts %>%
 ```{r}
 
 # reorder lineplots
-
 # view data
 glimpse(income_mean)
 
@@ -249,19 +254,24 @@ starwars_clean
 
 ```
 
-# Data  
+# Data: 9B Homework
 
 ```{r}
 
 # Data upload
 # Read in csv
-
 # intertidal dataset
 data.tide <-read_csv(here("Week_09", "Data", "intertidaldata.csv"))
 
 view(data.tide) # dataset
 glimpse(data.tide) # check it out
 
+```
+
+```{r}
+
+# Data upload
+# Read in csv
 # intertidal latitude dataset 
 data.lat <-read_csv(here("Week_09", "Data", "intertidaldata_latitude.csv"))
 
@@ -269,12 +279,10 @@ view(data.lat) # dataset
 glimpse(data.lat) # check it out
 ```
 
-
 ```{r}
 
 # i want to join both datasets by site
 # they both have sites in common
-
 
 join <- inner_join(data.lat, data.tide) %>% # join the data sets by site
   drop_na() # remove the na's
@@ -315,7 +323,7 @@ join_clean %>% # data set
 ```
 
 
-# Plot
+# Plot  
 
 ```{r}
 
@@ -323,7 +331,7 @@ join_clean %>% # data set
 # include a factor on one axis
 # make sure the values are organized alphabetically/chronologically
 
-join_clean %>% # data set
+anemoneplot <- join_clean %>% # data set
   select(site, quadrat, anemone, latitude) %>% # focal columns
   filter(quadrat == "High") %>% # focal quadrat
   ggplot(aes(x = anemone, # x axis value
@@ -336,6 +344,12 @@ join_clean %>% # data set
        title = "Anemone in the Intertidal Zone at High Tide") + # plot title
   theme_bw() + # theme
   theme(legend.position = "none")  # remove legend
+
+# save plot to my output folder
+ggsave(here("Week_09", "Output", "anemoneplot.png")) 
+
+# view plot
+anemoneplot
 
 ```
 

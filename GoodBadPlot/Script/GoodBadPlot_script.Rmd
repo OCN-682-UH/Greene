@@ -2,8 +2,9 @@
 title: '**Good Plot, Bad Plot**'
 author: "Kauanoe Greene"
 date: "2024-10-28"
-output: 
-html_document:
+output:
+  github_document:
+    toc: TRUE
 ---
   
   
