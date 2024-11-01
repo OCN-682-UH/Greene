@@ -1,7 +1,7 @@
 ---
 title: 'Week_09B: Working with Factors'
 author: "Kauanoe Greene"
-date: "2024-10-29"
+date: "2024-10-31"
 output: html_document
 ---
 
@@ -15,20 +15,24 @@ knitr::opts_chunk$set(echo = TRUE,
                       fig.path = "../Output/")
 ```
 
-
+# Libraries  
 ```{r}
 
 # Packages
 # install.packages("forcats")
-
+# install.packages("janitor")
 
 # Libraries
 
 library(tidyverse)
+library(tidytext)
 library(here)
+library(janitor)
+library(viridis)
 
 ```
 
+# Data  
 
 ```{r}
 # DATA
@@ -109,7 +113,6 @@ star_counts %>%
   ggplot(aes(x = fct_reorder(species, n), y = n))+ # reorder the factor of species by n
   geom_col()
 
-
 ```
 
 ```{r}
@@ -160,7 +163,6 @@ total_income%>%
              color = fct_reorder2(income_quintile,year,income_dollars_sum)))+
   geom_line()+
   labs(color = "income quantile")
-
 
 ```
 
@@ -224,6 +226,118 @@ starwars_clean<-starwars %>%
   mutate(species = fct_recode(species, "Humanoid" = "Human"))
 starwars_clean
 
+```
+
+# Homework  
+
+```{r}
+
+# Homework
+
+# Data set: 
+# Use either intertidal.csv or intertidal_latitude.csv
+
+# Task 1: Clean data!
+# Reorder your factors into orders that make sense!
+# Fix the column headers, too!
+# Use the Janitor Package
+
+# Task 2: Plot!
+# Make any type of plot where one axis is a factor
+# If you decide to plot tide height, order it low-high
+# If you decide to plot site, order it by latitude (s-n or n-s)
 
 ```
+
+# Data  
+
+```{r}
+
+# Data upload
+# Read in csv
+
+# intertidal dataset
+data.tide <-read_csv(here("Week_09", "Data", "intertidaldata.csv"))
+
+view(data.tide) # dataset
+glimpse(data.tide) # check it out
+
+# intertidal latitude dataset 
+data.lat <-read_csv(here("Week_09", "Data", "intertidaldata_latitude.csv"))
+
+view(data.lat) # dataset
+glimpse(data.lat) # check it out
+```
+
+
+```{r}
+
+# i want to join both datasets by site
+# they both have sites in common
+
+
+join <- inner_join(data.lat, data.tide) %>% # join the data sets by site
+  drop_na() # remove the na's
+glimpse(join) # check it out
+
+```
+
+
+
+```{r}
+
+# clean column names and values
+
+join_clean <- clean_names(join) # clean up the column names
+glimpse(join_clean) # check it out
+
+```
+
+```{r}
+
+# change characters into factors
+
+join_clean$quadrat <- join_clean$quadrat %>% # focal column: quadrat
+  factor(levels = c("Low", "Mid", "High")) %>% # factor levels
+  str_replace_all(". [1]", "") # remove unwanted symbols
+glimpse(join_clean) # check it out
+```
+
+
+```{r}
+
+# convert characters to factors!
+
+join_clean %>% # data set
+  mutate(site = fct_lump(site)) %>% # an attempt to make site characters into factors
+  mutate(quadrat = fct_lump(quadrat)) # an attempt to make quadrat characters into factors
+  
+```
+
+
+# Plot
+
+```{r}
+
+# plot!
+# include a factor on one axis
+# make sure the values are organized alphabetically/chronologically
+
+join_clean %>% # data set
+  select(site, quadrat, anemone, latitude) %>% # focal columns
+  filter(quadrat == "High") %>% # focal quadrat
+  ggplot(aes(x = anemone, # x axis value
+             y = fct_reorder(site, latitude), # y axis value and organize by latitude (tried plotting on x axis but it got smooshed)
+             color = site)) + # color the different sites
+  geom_line() + # plot type
+  geom_point() + # plot point
+  labs(x = "Anemone Count", # x axis title
+       y = "Site", # y axis title 
+       title = "Anemone in the Intertidal Zone at High Tide") + # plot title
+  theme_bw() + # theme
+  theme(legend.position = "none")  # remove legend
+
+```
+
+
 
