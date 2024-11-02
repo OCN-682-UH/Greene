@@ -1,7 +1,7 @@
 Week 09B: Working with Factors
 ================
 Kauanoe Greene
-2024-10-31
+2024-11-01
 
 - [Libraries](#libraries)
 - [Data: 9B Flipped Lecture](#data-9b-flipped-lecture)
