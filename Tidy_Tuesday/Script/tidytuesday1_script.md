@@ -7,6 +7,7 @@ Kauanoe Greene
 - [Data Upload](#data-upload)
 - [Data Analyses](#data-analyses)
 - [Plot](#plot)
+- [Takeaways from this assignment](#takeaways-from-this-assignment)
 
 # Libraries
 
@@ -112,7 +113,7 @@ badhorrorplot <- rating_genre %>% # datasheet
 badhorrorplot  
 ```
 
-![](../Output/Data%20Plot-1.png)<!-- -->
+![](../Output/plotting-1.png)<!-- -->
 
 ``` r
 # add labels
@@ -140,9 +141,20 @@ horrorplot <- rating_genre %>% # datasheet
 horrorplot
 ```
 
-![](../Output/unnamed-chunk-4-1.png)<!-- -->
+![](../Output/horrorplot-1.png)<!-- -->
 
 ``` r
 # save plot to my output folder
 ggsave(here("Tidy_Tuesday", "Output", "horrorplot.png")) 
+
+# save csv file to data folder
+write.csv(rating_genre, here("Tidy_Tuesday", "Data", "rating_genre.csv"))
 ```
+
+# Takeaways from this assignment
+
+- I read in the CSV file directly from GitHub, for the first time.  
+- I practiced more data organization, which I never feel super confident
+  with.  
+- I practiced with factors, a bit, and got the x-axis sorted in
+  numerical order.

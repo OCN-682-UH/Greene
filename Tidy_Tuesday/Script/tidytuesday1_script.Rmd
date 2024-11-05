@@ -40,7 +40,7 @@ monster_movie_genres <- readr::read_csv('https://raw.githubusercontent.com/rford
 glimpse(monster_movie_genres)
 
 ```
-```{r}
+```{r readincsv}
 
 # read in data from github
 # view it
@@ -54,7 +54,7 @@ glimpse(monster_movies)
 
 # Data Analyses  
 
-```{r}
+```{r joints}
 
 # join data sets by tconst using inner_join function.
 
@@ -64,7 +64,7 @@ glimpse(monsterdata)
 
 ```
 
-```{r}
+```{r cleaning}
 
 # group data by genre, title, and ratings
 
@@ -80,7 +80,7 @@ glimpse(rating_genre)
 
 ```
 # Plot
-```{r Data Plot}
+```{r plotting}
 
 # plot data
 
@@ -93,7 +93,7 @@ badhorrorplot
 ```
 
 
-```{r}
+```{r horrorplot}
 
 # add labels
 
@@ -121,12 +121,19 @@ horrorplot
 
 ```
 
-```{r}
+```{r wrap-up}
 
 # save plot to my output folder
 ggsave(here("Tidy_Tuesday", "Output", "horrorplot.png")) 
 
+# save csv file to data folder
+write.csv(rating_genre, here("Tidy_Tuesday", "Data", "rating_genre.csv"))
+
 ```
 
+# Takeaways from this assignment  
+- I read in the CSV file directly from GitHub, for the first time.  
+- I practiced more data organization, which I never feel super confident with.  
+- I practiced with factors, a bit, and got the x-axis sorted in numerical order.  
 
 
