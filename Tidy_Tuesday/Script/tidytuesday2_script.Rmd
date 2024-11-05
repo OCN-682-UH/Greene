@@ -1,0 +1,73 @@
+---
+title: "Tidy Tuesday!"
+author: "Kauanoe Greene"
+date: "2024-11-05"
+output: 
+  github_document:
+    toc: TRUE
+---
+
+```{r setup, include=FALSE}
+
+# Let us set up Rmarkdown file
+
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE, 
+                      fig.path = "../Output/")
+```
+
+# Libraries  
+```{r Libraries}
+
+# Packages
+
+# install.packages("tidytuesdayR")
+
+# Libraries
+
+library(tidyverse)
+library(tidytext)
+library(here)
+library(janitor)
+library(viridis)
+library(maps)
+library(mapdata)
+library(mapproj)
+```
+# Data Upload
+
+```{r Data Upload}
+
+# Dataset: Democracy and Dictatorship
+
+democracy_data <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2024/2024-11-05/democracy_data.csv')
+
+view(democracy_data)
+
+```
+
+# Data Analyses
+
+```{r Data Analyses}
+
+world <- map_data("world")
+view(world)
+
+fm <- democracy_data %>% 
+  select(country_name, is_female_monarch)
+
+view(fm)
+
+fm_country <- fm %>% 
+  group_by(country_name, is_female_monarch) %>% 
+  drop_na() %>% 
+  filter(is_female_monarch == "TRUE")
+
+view(fm_country)
+
+```
+
+
+
+

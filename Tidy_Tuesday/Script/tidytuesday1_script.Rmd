@@ -1,0 +1,132 @@
+---
+title: "Tidy Tuesday!"
+author: "Kauanoe Greene"
+date: "2024-11-05"
+output: 
+  github_document:
+    toc: TRUE
+---
+
+```{r setup, include=FALSE}
+
+# Let us set up Rmarkdown file
+
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE, 
+                      fig.path = "../Output/")
+```
+
+# Libraries  
+
+```{r Libraries}
+
+library(tidyverse)
+library(tidytext)
+library(here)
+library(viridis)
+
+```
+
+# Data Upload  
+
+```{r Data Upload}
+
+# read in data from github
+# view it
+
+monster_movie_genres <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2024/2024-10-29/monster_movie_genres.csv')
+
+glimpse(monster_movie_genres)
+
+```
+```{r}
+
+# read in data from github
+# view it
+
+monster_movies <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2024/2024-10-29/monster_movies.csv')
+
+glimpse(monster_movies)
+
+```
+
+
+# Data Analyses  
+
+```{r}
+
+# join data sets by tconst using inner_join function.
+
+monsterdata <- inner_join(monster_movie_genres, monster_movies)
+view(monsterdata)
+glimpse(monsterdata)
+
+```
+
+```{r}
+
+# group data by genre, title, and ratings
+
+rating_genre <- monsterdata %>% 
+  select(genres, primary_title, average_rating) %>% 
+  group_by(genres, average_rating) %>% 
+  drop_na() %>% 
+  filter(average_rating <= "5") %>% 
+  filter(genres == "Horror") %>% 
+  mutate(primary_title = fct_lump(primary_title))
+
+glimpse(rating_genre)
+
+```
+# Plot
+```{r Data Plot}
+
+# plot data
+
+badhorrorplot <- rating_genre %>% # datasheet
+  ggplot(aes(x = average_rating, # x-axis
+             y = primary_title)) + # colors
+  geom_point() # data point # plot
+  
+badhorrorplot  
+```
+
+
+```{r}
+
+# add labels
+
+horrorplot <- rating_genre %>% # datasheet
+  ggplot(aes(x = average_rating, # x-axis
+             y = primary_title, 
+             color = average_rating)) + # colors
+  geom_point() +  # data point # plot
+  labs(title = "The Worst Horror Movies, Ever", 
+       x = "Average Rating", 
+       y = "Movie Title", 
+       caption = "Data sourced from Tidy Tuesday (2024)", 
+       subtitle = "Monster horror movies rated poorly on a 10 point scale") + 
+  theme_bw() + 
+  theme(legend.position = "none", 
+        plot.title = element_text(hjust = 0.5), # bold title
+        axis.text.x = element_text(size = 8), axis.title.x = element_text(size = 10), # adjust x-axis labels
+        axis.text.y = element_text(size = 8), axis.title.y = element_text(size = 10),   # adjust y-axis labels
+        plot.caption = element_text(size = 6, hjust = 0.5),
+        plot.subtitle = element_text(size = 8, hjust = 0.5)) + 
+          scale_color_viridis()
+  
+
+horrorplot
+
+```
+
+```{r}
+
+# save plot to my output folder
+ggsave(here("Tidy_Tuesday", "Output", "horrorplot.png")) 
+
+```
+
+
+
