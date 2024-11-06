@@ -1,0 +1,108 @@
+---
+title: "fitness traits!"
+author: "Kauanoe Greene"
+date: "2024-11-05"
+output:
+  github_document:
+    toc: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE, 
+                      fig.path = "../Output/")
+```
+
+```{r Libraries}
+
+# LIBRARIES
+library(tidyverse)
+library(here)
+library(patchwork)
+library(ggrepel)
+library(gganimate)
+library(magick)
+library(viridis)
+
+```
+
+```{r Data Upload}
+
+survival <- read_csv(here("Project", "Data", "survivalrate.csv"))
+growth <- read_csv(here("Project", "Data", "meantotalbiomass.csv"))
+summary <- read_csv(here("Project", "Data", "summary.csv"))
+
+view(survival)
+view(growth)
+view(summary)
+
+```
+```{r}
+# Pivot longer
+
+survival_long <- survival %>% 
+  group_by(Treatment) %>% 
+  pivot_longer(cols = Koko:Ekahanui, # reorient for facet wrap!
+                 names_to = "Population", # name of the parameter column
+                 values_to = "Survival") # name of value column
+
+view(survival_long)
+
+```
+
+
+```{r Data Plot: tswc}
+
+survivalplot <- survival_long %>% 
+  ggplot(aes(x = Treatment, 
+             y = Survival,
+             color = Population)) + 
+  geom_point() + 
+  labs(subtitle = "Detecting variability in survival of control and drought plants across populations", 
+       caption = "Fitness Trait Data collected 2022-2023", 
+       x = "Treatment Group", 
+       y = "Survival Rate (%)") +
+  ggtitle("Main Effect of Drought on Survival")
+
+# save plot
+ggsave(here("Project", "Output", "survivalplot.png")) # save my plot into my output folder!
+
+# view plot
+survivalplot
+
+```
+```{r}
+# Pivot longer
+
+summary_long <- summary %>% 
+  pivot_longer(cols = survival.rate:mean.tswc, # reorient for facet wrap!
+                 names_to = "Traits", # name of the parameter column
+                 values_to = "Values") # name of value column
+
+view(summary_long)
+```
+
+```{r Data Plot: summary}
+
+summaryplot <- means %>% 
+  ggplot(aes(x = Treatment, 
+             y = mean.cond, 
+             color = Treatment)) + 
+  geom_point() + 
+  geom_line() + 
+  labs(subtitle = "Detecting trends in plasticity of leaf stomatal conductance amongst control and drought groups over time", 
+       caption = "Functional Trait Data collected 2022-2023", 
+       x = "Time (Weeks)", 
+       y = "Mean Stomatal Conductance (mmol m^(-2) s^(-1)") +
+  ggtitle("Effects of Drought on Leaf Stomatal Conductance Across Populations") +
+  facet_wrap(~Population)
+
+# save plot
+ggsave(here("Project", "Output", "conductanceplot.png")) # save my plot into my output folder!
+
+# view plot
+conductanceplot
+
+```
+

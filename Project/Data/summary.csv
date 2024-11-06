@@ -1,0 +1,3 @@
+Treatment,survival.rate,mean.longevity,mean.biomass,mean.tswc,std.lon,std.tswc,std.biomass
+Control,97,21,2.179833333,31.98,1.401989657,1.011255901,0.395083313
+Drought,47,27,0.347088889,32.46,2.656156223,1.776422401,0.10296227
