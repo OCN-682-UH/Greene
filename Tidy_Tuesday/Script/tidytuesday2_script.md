@@ -7,7 +7,7 @@ Kauanoe Greene
 - [Data Upload](#data-upload)
 - [Data Analyses](#data-analyses)
 - [Plot](#plot)
-- [Tidy Tuesday Wrap-up!](#tidy-tuesday-wrap-up)
+- [Wrap-up!](#wrap-up)
 
 # Libraries
 
@@ -160,12 +160,12 @@ glimpse(female_monarch)
 # time to plot it all!
 # i want to just see the ratio between monarchies not led by/led by women are around the world.  
 
-monarchplot <- female_monarch %>% # dataset of choice
+tidyplot2 <- female_monarch %>% # dataset of choice
   ggplot(aes(x="", 
              y=is_female_monarch, # data to plot
              fill = is_female_monarch)) + # I choose to display the "is_female_monarch" data in the pie
   geom_bar(stat="identity", width=1) + 
-  scale_fill_manual(breaks= c("FALSE", "TRUE"), labels = c("Female Monarch", "No Female Monarch"), values = c("salmon", "lightblue")) + # rename legend variables
+  scale_fill_manual(breaks= c("FALSE", "TRUE"), labels = c("No Female Monarch", "Female Monarch"), values = c("salmon", "lightblue")) + # rename legend variables
   coord_polar("y", start=0) + # make the pie shape
   theme_void() + # make the gridlines nd background dissapear
   ggtitle("Female Monarchs of 2020") + # add a title
@@ -176,15 +176,15 @@ monarchplot <- female_monarch %>% # dataset of choice
         
        
 # save plot to my output folder
-ggsave(here("Tidy_Tuesday", "Output", "monarchplot.png")) 
+ggsave(here("Tidy_Tuesday", "Output", "tidyplot2.png")) 
 
 # view plot
-monarchplot      
+tidyplot2      
 ```
 
 ![](../Output/unnamed-chunk-2-1.png)<!-- -->
 
-# Tidy Tuesday Wrap-up!
+# Wrap-up!
 
 - This was my first time using such a huge data set!  
 - Practiced filtering the data to reduce the data set in size  

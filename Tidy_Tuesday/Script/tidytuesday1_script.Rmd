@@ -84,12 +84,12 @@ glimpse(rating_genre)
 
 # plot data
 
-badhorrorplot <- rating_genre %>% # datasheet
+badplot1 <- rating_genre %>% # datasheet
   ggplot(aes(x = average_rating, # x-axis
              y = primary_title)) + # colors
   geom_point() # data point # plot
   
-badhorrorplot  
+badplot1  
 ```
 
 
@@ -97,7 +97,7 @@ badhorrorplot
 
 # add labels
 
-horrorplot <- rating_genre %>% # datasheet
+tidyplot1 <- rating_genre %>% # datasheet
   ggplot(aes(x = average_rating, # x-axis
              y = primary_title, 
              color = average_rating)) + # colors
@@ -117,17 +117,17 @@ horrorplot <- rating_genre %>% # datasheet
           scale_color_viridis()
   
 
-horrorplot
+tidyplot1
 
 ```
 
 ```{r wrap-up}
 
 # save plot to my output folder
-ggsave(here("Tidy_Tuesday", "Output", "horrorplot.png")) 
+ggsave(here("Tidy_Tuesday", "Output", "tidyplot1.png")) 
 
 # save csv file to data folder
-write.csv(rating_genre, here("Tidy_Tuesday", "Data", "rating_genre.csv"))
+write.csv(rating_genre, here("Tidy_Tuesday", "Data", "tidydata1.csv"))
 
 ```
 
