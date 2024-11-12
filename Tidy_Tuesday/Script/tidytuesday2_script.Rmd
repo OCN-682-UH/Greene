@@ -18,6 +18,7 @@ knitr::opts_chunk$set(echo = TRUE,
 ```
 
 # Libraries  
+
 ```{r Libraries}
 
 # Packages
@@ -29,11 +30,6 @@ knitr::opts_chunk$set(echo = TRUE,
 library(tidyverse)
 library(tidytext)
 library(here)
-library(janitor)
-library(viridis)
-library(maps)
-library(mapdata)
-library(mapproj)
 ```
 # Data Upload
 
@@ -41,9 +37,9 @@ library(mapproj)
 
 # Dataset: Democracy and Dictatorship
 
-democracy_data <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2024/2024-11-05/democracy_data.csv')
+democracy_data <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2024/2024-11-05/democracy_data.csv') # data upload straight from github!
 
-view(democracy_data)
+glimpse(democracy_data) # check out the data
 
 ```
 
@@ -51,12 +47,13 @@ view(democracy_data)
 
 ```{r Data Analyses}
 
-# filter year >= 2020
+# this is a huge dataset! let's filter it down.  
+# filter year >= 2020  
 
-year <- democracy_data %>% 
-  filter(year >= "2020")
+year <- democracy_data %>% # data set of choice
+  filter(year >= "2020") # we want to only see the entries from 2020 and beyond.
 
-glimpse(year)
+glimpse(year) # check it out
 
 ```
 
@@ -75,52 +72,40 @@ glimpse(female_monarch)
 
 ```{r}
 
-female_monarch %>% 
-  ggplot(aes(x="", y=is_female_monarch, fill=is_female_monarch)) +
-  geom_bar(stat="identity", width=1) +
-  coord_polar("y", start=0) +
-  theme_void() + 
-  ggtitle("Female Monarchs of 2020") + 
-  theme(plot.title = element_text(face = "bold", color = "black", hjust = 0.5))
+# time to plot it all!
+# i want to just see the ratio between monarchies not led by/led by women are around the world.  
+
+monarchplot <- female_monarch %>% # dataset of choice
+  ggplot(aes(x="", 
+             y=is_female_monarch, # data to plot
+             fill = is_female_monarch)) + # I choose to display the "is_female_monarch" data in the pie
+  geom_bar(stat="identity", width=1) + 
+  scale_fill_manual(breaks= c("FALSE", "TRUE"), labels = c("Female Monarch", "No Female Monarch"), values = c("salmon", "lightblue")) + # rename legend variables
+  coord_polar("y", start=0) + # make the pie shape
+  theme_void() + # make the gridlines nd background dissapear
+  ggtitle("Female Monarchs of 2020") + # add a title
+  labs(subtitle = "Comparing countries with and without a female monarch since 2020", # plot subtitle
+       caption = "Data sourced from: TidyTuesday!") + # source of data
+  theme(plot.title = element_text(face = "bold", color = "black", hjust = 0.5),   # adjust the font and center it
+        legend.title = element_blank()) # remove legend title
+        
+       
+# save plot to my output folder
+ggsave(here("Tidy_Tuesday", "Output", "monarchplot.png")) 
+
+# view plot
+monarchplot      
  
   
 
 
 ```
 
-
-```{r}
-
-# Plotting 
-# Let us plot to compare what countries do and do not have female monarchs in 2020.
-
-female_monarch_2020 <- female_monarch %>% 
-  ggplot(aes(x = is_female_monarch, # x-axis
-             y = country_name, # y-axis
-             color = is_female_monarch)) + # colors
-  geom_point() +  # data points
-  geom_line() +  # plot
-  labs(subtitle = "Detecting intraspecific variation in plasticity of rates of chlorophyll content in response to drought stress", # plot subtitle
-       caption = "Data sourced from: Greene 2023", # plot caption
-       x = "Time (Weeks)", # x-axis label
-       y = "Mean Chlorophyll Content") + # y-axis label
-  ggtitle("Effects of Drought on Leaf Chlorophyll Content in 'A'ali'i") + # plot title
-  scale_color_manual(breaks= c("C", "PD"), labels = c("Control Group", "Pulse Drought Group"), values = c("darkgreen", "brown")) + # rename legend variables
-  theme(plot.title = element_text(face = "bold", color = "black", hjust = 0.5), # bold title
-        axis.text.x = element_text(size = 8), axis.title.x = element_text(size = 10), # adjust x-axis labels
-        axis.text.y = element_text(size = 8), axis.title.y = element_text(size = 10),   # adjust y-axis labels
-        legend.position = "top", 
-        plot.subtitle = element_text(size = 10, hjust = 0.5), 
-        legend.title = element_blank())
-
-# save plot to my output folder
-ggsave(here("Tidy_Tuesday", "Output", "monarchplot.png")) 
-
-# view plot
-chlplot
-
-```
-
+# Tidy Tuesday Wrap-up!  
+- This was my first time using such a huge data set!  
+- Practiced filtering the data to reduce the data set in size  
+- My first time attempting a pie chart! lol.  
+- My first time using "scale_fill_manual" to manually adjust the legend and fill options.  
 
 
 
