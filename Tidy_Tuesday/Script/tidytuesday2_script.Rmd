@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE,
 
 # Libraries  
 
-```{r Libraries}
+```{r libraries}
 
 # Packages
 
@@ -33,7 +33,7 @@ library(here)
 ```
 # Data Upload
 
-```{r Data Upload}
+```{r upload}
 
 # Dataset: Democracy and Dictatorship
 
@@ -45,7 +45,7 @@ glimpse(democracy_data) # check out the data
 
 # Data Analyses
 
-```{r Data Analyses}
+```{r analyese}
 
 # this is a huge dataset! let's filter it down.  
 # filter year >= 2020  
@@ -57,7 +57,7 @@ glimpse(year) # check it out
 
 ```
 
-```{r}
+```{r clean}
 
 # Data Clean  
 # Let us see what countries have female monarchs as of 2020  
@@ -70,7 +70,7 @@ glimpse(female_monarch)
 ```
 # Plot  
 
-```{r}
+```{r tidyplot2}
 
 # time to plot it all!
 # i want to just see the ratio between monarchies not led by/led by women are around the world.  

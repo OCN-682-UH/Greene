@@ -113,7 +113,7 @@ badplot1 <- rating_genre %>% # datasheet
 badplot1  
 ```
 
-![](../Output/plotting-1.png)<!-- -->
+![](../Output/plot%20attempt-1.png)<!-- -->
 
 ``` r
 # add labels
@@ -141,7 +141,7 @@ tidyplot1 <- rating_genre %>% # datasheet
 tidyplot1
 ```
 
-![](../Output/horrorplot-1.png)<!-- -->
+![](../Output/tidyplot1-1.png)<!-- -->
 
 ``` r
 # save plot to my output folder

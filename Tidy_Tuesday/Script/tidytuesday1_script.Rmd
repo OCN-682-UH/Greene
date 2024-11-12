@@ -19,18 +19,17 @@ knitr::opts_chunk$set(echo = TRUE,
 
 # Libraries  
 
-```{r Libraries}
+```{r libraries}
 
 library(tidyverse)
 library(tidytext)
 library(here)
 library(viridis)
-
 ```
 
 # Data Upload  
 
-```{r Data Upload}
+```{r upload}
 
 # read in data from github
 # view it
@@ -64,7 +63,7 @@ glimpse(monsterdata)
 
 ```
 
-```{r cleaning}
+```{r clean}
 
 # group data by genre, title, and ratings
 
@@ -80,7 +79,7 @@ glimpse(rating_genre)
 
 ```
 # Plot
-```{r plotting}
+```{r plot attempt}
 
 # plot data
 
@@ -93,7 +92,7 @@ badplot1
 ```
 
 
-```{r horrorplot}
+```{r tidyplot1}
 
 # add labels
 

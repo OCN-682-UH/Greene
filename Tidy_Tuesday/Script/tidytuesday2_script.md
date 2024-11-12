@@ -182,7 +182,7 @@ ggsave(here("Tidy_Tuesday", "Output", "tidyplot2.png"))
 tidyplot2      
 ```
 
-![](../Output/unnamed-chunk-2-1.png)<!-- -->
+![](../Output/tidyplot2-1.png)<!-- -->
 
 # Wrap-up!
 
