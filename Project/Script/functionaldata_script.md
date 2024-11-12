@@ -199,16 +199,19 @@ primary interaction) - Chlorophyll: trait of focus
 - Treatment: fixed factor (drought)  
 - Population: random factor  
 - Population \* Treatment: random interaction  
-- Week \* Treatment: fixed?? idk. Must ask Kasey.
+- Week \* Treatment: fixed?? idk. Must ask Kasey.  
+- Questions for Kasey: how do we determine whether the
+log-transformed/untransformed data is ideal?
 
 ``` r
 # PT.I  
 
 # PRIMARY INTERACTION TREATMENT: UNTRANSFORMED DATA!  
 # The F-statistic will be the final value for our Drought column in our results table.
-# RESULT: F-stat: 3.5275
+# Reported value: F-stat
+# RESULT: (F-stat) 3.5275, (p-val) 0.09882
 
-chl.primary.A = lmer(Chlorophyll ~ Treatment + (1|Week) + (1|ID) + (1|Population) + (1|Population:Treatment) + (1|Population:Treatment:Week), data = cleandata)
+chl.primary.A = lmer(Chlorophyll ~ Treatment + (1|Week) + (1|ID) + (1|Population) + (1|Population:Treatment) + (1|Population:Treatment:Week), data = cleandata, na.action = na.omit)
 
 Anova(chl.primary.A, test.statistic = "F", type = 3)
 ```
@@ -273,9 +276,10 @@ glimpse(log.chl)
 
 ``` r
 # PRIMARY INTERACTION: TRANSFORMED DATA!
-# RESULTS: F-stat: 0.3662
+# Reported value: F-stat
+# RESULTS: (F-stat) 0.3662 +, (p-val) 0.5626
 
-chl.primary.B = lmer(log.chl ~ Treatment + (1|Week) + (1|ID) + (1|Population) + (1|Population:Treatment) + (1|Population:Treatment:Week), data = cleandata)
+chl.primary.B = lmer(log.chl ~ Treatment + (1|Week) + (1|ID) + (1|Population) + (1|Population:Treatment) + (1|Population:Treatment:Week), data = cleandata, na.action = na.omit)
 
 Anova(chl.primary.B, test.statistic = "F", type=3) 
 ```
@@ -356,6 +360,7 @@ Anova(chl.reduced.pop)
 
 ``` r
 # This only tests the effect of pulse drought treatment on the chlorophyll content results
+# we use glm because when we remove the "population" factor, we no longer have a random effect specified in the formula.
 
 chl.reduced.dr = glm(Chlorophyll ~ Treatment, data = cleandata)
 # i removed everything but the treatment data so we can see the treatment effect on chlorophyll content results
@@ -384,8 +389,9 @@ Anova(chl.reduced.dr)
 
 # COMPARISON MODELS!
 # This compares the primary interaction model and population effect reduced model.
+# Reported value: chisq
 # The chisq value will be final result for our P X D column in our table.
-# RESULT: 67.711
+# RESULT: (chisq) 67.711 ***, (p-val) 1.981e-15
 
 anova(chl.primary.A, chl.reduced.pop)
 ```
@@ -413,9 +419,20 @@ anova(chl.primary.A, chl.reduced.pop)
 ```
 
 ``` r
-# This compares the population effect reduced model and the treatment effect reduced model.
-# The LRT value will be final result for our Population column in our table.
-# RESULT: (LRT) 
+# This compares the population effect reduced model (glm) and the treatment effect reduced model (lmer).
+# Reported value: chisq
+# The chisq value will be final result for our Population column in our table.
+# RESULT: (chisq) 176.41***, (p-val) < 2.2e-16
 
-# exactLRT(chl.reduced.pop,chl.reduced.dr) # LRT (Pop column)
+anova(chl.reduced.pop,chl.reduced.dr)
 ```
+
+    ## Data: cleandata
+    ## Models:
+    ## chl.reduced.dr: Chlorophyll ~ Treatment
+    ## chl.reduced.pop: Chlorophyll ~ Treatment + (1 | Week) + (1 | ID) + (1 | Population)
+    ##                 npar    AIC    BIC  logLik deviance  Chisq Df Pr(>Chisq)    
+    ## chl.reduced.dr     3 7611.8 7626.9 -3802.9   7605.8                         
+    ## chl.reduced.pop    6 7441.4 7471.5 -3714.7   7429.4 176.41  3  < 2.2e-16 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1

@@ -1,10 +1,9 @@
 ---
-title: "fitness traits!"
+title: "Fitness Traits!"
 author: "Kauanoe Greene"
 date: "2024-11-05"
 output:
   github_document:
-    toc: TRUE
 ---
 
 ```{r setup, include=FALSE}
@@ -14,95 +13,142 @@ knitr::opts_chunk$set(echo = TRUE,
                       fig.path = "../Output/")
 ```
 
+# Libraries  
+
 ```{r Libraries}
 
 # LIBRARIES
+
+# visuals
 library(tidyverse)
+library(tidytext)
 library(here)
-library(patchwork)
-library(ggrepel)
-library(gganimate)
-library(magick)
-library(viridis)
+
+# models (stats)
+library(lmerTest)
+library (RLRsim)
+library(Matrix)
+# library(lme4)
+library(lattice)
+library(car)
+library(nlme)
 
 ```
+
+# Data Upload  
+
 
 ```{r Data Upload}
 
-survival <- read_csv(here("Project", "Data", "survivalrate.csv"))
-growth <- read_csv(here("Project", "Data", "meantotalbiomass.csv"))
-summary <- read_csv(here("Project", "Data", "summary.csv"))
+fitness <- read_csv(here("Project", "Data", "fitnessharvest_master.csv"))
 
-view(survival)
-view(growth)
-view(summary)
+view(fitness)
 
+```
+
+# Biomass  
+
+```{r primary}
+
+# revised syntax for primary interaction
+
+# Biomass2 = lmer(logbiomass~ Treatment + (1|Population) + (1|Population:Treatment), data=Kauanoe.drought.fitness, na.action = na.omit)
+
+
+mod.biomassA = lmer(Total ~ Treatment + (1|Population) + (1|Population:Treatment), data = fitness, na.action = na.omit)
+Anova(mod.biomassA, test.statistic="F", type=3) #F-statistic: 15.593  (Drought column) **
+
+# Analysis of Deviance Table (Type III Wald F tests with Kenward-Roger df)
+# Response: Total
+                 # F Df Df.res    Pr(>F)    
+# (Intercept) 50.077  1 13.349 7.206e-06 ***
+# Treatment   15.593  1  8.006  0.004237 ** 
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+```
+
+```{r normality test A}
+
+#checking normality of residuals in untransformed data
+
+shapiro.test(resid(mod.biomassA)) #p-value: 7.827e-06
+```
+
+```{r}
+qqnorm(resid(mod.biomassA)) #untransofrmed data
 ```
 ```{r}
-# Pivot longer
-
-survival_long <- survival %>% 
-  group_by(Treatment) %>% 
-  pivot_longer(cols = Koko:Ekahanui, # reorient for facet wrap!
-                 names_to = "Population", # name of the parameter column
-                 values_to = "Survival") # name of value column
-
-view(survival_long)
-
+logbiomass<-log(fitness$Total) #log-transformed data
 ```
 
 
-```{r Data Plot: tswc}
-
-survivalplot <- survival_long %>% 
-  ggplot(aes(x = Treatment, 
-             y = Survival,
-             color = Population)) + 
-  geom_point() + 
-  labs(subtitle = "Detecting variability in survival of control and drought plants across populations", 
-       caption = "Fitness Trait Data collected 2022-2023", 
-       x = "Treatment Group", 
-       y = "Survival Rate (%)") +
-  ggtitle("Main Effect of Drought on Survival")
-
-# save plot
-ggsave(here("Project", "Output", "survivalplot.png")) # save my plot into my output folder!
-
-# view plot
-survivalplot
-
-```
 ```{r}
-# Pivot longer
 
-summary_long <- summary %>% 
-  pivot_longer(cols = survival.rate:mean.tswc, # reorient for facet wrap!
-                 names_to = "Traits", # name of the parameter column
-                 values_to = "Values") # name of value column
+#checking normality of residuals in transformed data
 
-view(summary_long)
+mod.biomassB = lmer(logbiomass ~ Treatment + (1|Population) + (1|Population:Treatment), data = fitness, na.action = na.omit)
+Anova(mod.biomassB, test.statistic = "F", type=3) #F-statistic: 35.6707
+
+# Analysis of Deviance Table (Type III Wald F tests with Kenward-Roger df)
+# Response: logbiomass
+                  # F Df Df.res    Pr(>F)    
+# (Intercept)  4.6379  1 13.369 0.0500684 .  
+# Treatment   35.6707  1  7.991 0.0003349 ***
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 ```
 
-```{r Data Plot: summary}
+```{r}
+shapiro.test(resid(mod.biomassB)) #p-value: 4.242e-07
+```
 
-summaryplot <- means %>% 
-  ggplot(aes(x = Treatment, 
-             y = mean.cond, 
-             color = Treatment)) + 
-  geom_point() + 
-  geom_line() + 
-  labs(subtitle = "Detecting trends in plasticity of leaf stomatal conductance amongst control and drought groups over time", 
-       caption = "Functional Trait Data collected 2022-2023", 
-       x = "Time (Weeks)", 
-       y = "Mean Stomatal Conductance (mmol m^(-2) s^(-1)") +
-  ggtitle("Effects of Drought on Leaf Stomatal Conductance Across Populations") +
-  facet_wrap(~Population)
+```{r}
+qqnorm(resid(mod.biomassB))
+#Overall impression: untransformed data looks better.
+```
 
-# save plot
-ggsave(here("Project", "Output", "conductanceplot.png")) # save my plot into my output folder!
+# Reduced
 
-# view plot
-conductanceplot
+```{r}
+
+# population reduced
+
+mod.biomass.pop = lmer(Total~Treatment+ (1|Population), data = fitness)
+Anova(mod.biomass.pop)
 
 ```
+
+```{r}
+
+# treatment reduced
+
+mod.biomass.dr = glm(Total ~ Treatment, data = fitness)
+Anova(mod.biomass.dr)
+
+```
+# Comparison
+
+```{r}
+
+# reduced primary interaction x population comparison
+
+anova(mod.biomassA, mod.biomass.pop) #chisq: 2.8836 (P X D column)
+
+# Data: fitness
+# Models:
+# mod.biomass.pop: Total ~ Treatment + (1 | Population)
+# mod.biomassA: Total ~ Treatment + (1 | Population) + (1 | Population:Treatment)
+                # npar    AIC    BIC  logLik deviance  Chisq Df Pr(>Chisq)  
+# mod.biomass.pop    4 408.90 420.18 -200.45   400.90                       
+# mod.biomassA       5 408.01 422.12 -199.01   398.01 2.8836  1    0.08948 .
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+```
+
+```{r}
+
+# reduced population x treatment
+
+exactLRT(mod.biomass.pop, mod.biomass.dr) #LRT = 39.807, p-value < 2.2e-16 (Pop column) ***
+
+```
+
 

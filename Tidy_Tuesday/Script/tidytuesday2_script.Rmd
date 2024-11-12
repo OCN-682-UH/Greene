@@ -1,7 +1,7 @@
 ---
 title: "Tidy Tuesday!"
 author: "Kauanoe Greene"
-date: "2024-11-05"
+date: "2024-11-11"
 output: 
   github_document:
     toc: TRUE
@@ -51,20 +51,73 @@ view(democracy_data)
 
 ```{r Data Analyses}
 
-world <- map_data("world")
-view(world)
+# filter year >= 2020
 
-fm <- democracy_data %>% 
-  select(country_name, is_female_monarch)
+year <- democracy_data %>% 
+  filter(year >= "2020")
 
-view(fm)
+glimpse(year)
 
-fm_country <- fm %>% 
-  group_by(country_name, is_female_monarch) %>% 
-  drop_na() %>% 
-  filter(is_female_monarch == "TRUE")
+```
 
-view(fm_country)
+```{r}
+
+# Data Clean  
+# Let us see what countries have female monarchs as of 2020  
+
+female_monarch <- year %>% # rename dataset to female_monarchs
+  select(country_name, year, is_female_monarch) %>% # select focal data
+  drop_na() # drop empty rows
+
+glimpse(female_monarch)
+```
+# Plot  
+
+```{r}
+
+female_monarch %>% 
+  ggplot(aes(x="", y=is_female_monarch, fill=is_female_monarch)) +
+  geom_bar(stat="identity", width=1) +
+  coord_polar("y", start=0) +
+  theme_void() + 
+  ggtitle("Female Monarchs of 2020") + 
+  theme(plot.title = element_text(face = "bold", color = "black", hjust = 0.5))
+ 
+  
+
+
+```
+
+
+```{r}
+
+# Plotting 
+# Let us plot to compare what countries do and do not have female monarchs in 2020.
+
+female_monarch_2020 <- female_monarch %>% 
+  ggplot(aes(x = is_female_monarch, # x-axis
+             y = country_name, # y-axis
+             color = is_female_monarch)) + # colors
+  geom_point() +  # data points
+  geom_line() +  # plot
+  labs(subtitle = "Detecting intraspecific variation in plasticity of rates of chlorophyll content in response to drought stress", # plot subtitle
+       caption = "Data sourced from: Greene 2023", # plot caption
+       x = "Time (Weeks)", # x-axis label
+       y = "Mean Chlorophyll Content") + # y-axis label
+  ggtitle("Effects of Drought on Leaf Chlorophyll Content in 'A'ali'i") + # plot title
+  scale_color_manual(breaks= c("C", "PD"), labels = c("Control Group", "Pulse Drought Group"), values = c("darkgreen", "brown")) + # rename legend variables
+  theme(plot.title = element_text(face = "bold", color = "black", hjust = 0.5), # bold title
+        axis.text.x = element_text(size = 8), axis.title.x = element_text(size = 10), # adjust x-axis labels
+        axis.text.y = element_text(size = 8), axis.title.y = element_text(size = 10),   # adjust y-axis labels
+        legend.position = "top", 
+        plot.subtitle = element_text(size = 10, hjust = 0.5), 
+        legend.title = element_blank())
+
+# save plot to my output folder
+ggsave(here("Tidy_Tuesday", "Output", "monarchplot.png")) 
+
+# view plot
+chlplot
 
 ```
 
