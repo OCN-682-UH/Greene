@@ -1,0 +1,238 @@
+---
+title: "Chlorophyll"
+author: "Kauanoe Greene"
+date: "2024-11-13"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE, 
+                      fig.path = "../Output/")
+```
+
+# Libraries  
+
+```{r}
+
+# visuals
+library(tidyverse)
+library(tidytext)
+library(here)
+
+# models (stats)
+library(lmerTest)
+library (RLRsim)
+library(Matrix)
+# library(lme4)
+library(lattice)
+library(car)
+library(nlme)
+```
+
+# Data  
+
+```{r}
+
+# Data uploading
+functional.phase.data <- read_csv(here("Project", "Data", "functional.phase.data.csv"))
+glimpse(functional.phase.data)
+```
+
+# Statistic Modeling: Chlorophyll Content Data  
+
+- PT.I: Primary interaction treatment  
+- PT.II: Reduced models  
+- PT.III: Comparison models  
+
+## PT.I: Full Model 
+- main interaction  
+- includes all main factors and interactions  
+- F-statistic for a fixed effects mixed model  
+- results table: drought column   
+
+```{r}
+
+# drought column result: (F-stat) 3.9797, (p-val) 0.07637
+
+chl.full.A = lmer(Chlorophyll ~ Treatment + 
+                    (1|ID) + 
+                    (1|Population) + 
+                    (1|Week) + 
+                    (1|Population:Treatment) +  
+                    (1|Treatment:Week), 
+                  data = functional.phase.data, 
+                  na.action = na.omit)
+
+Anova(chl.full.A, test.statistic="F", type=3)
+```
+
+
+```{r}
+
+# Normality check: untransformed data  
+# Checking normality of residuals in untransformed data
+# W = 0.98162, p-value = 1.319e-10
+
+shapiro.test(resid(chl.full.A)) 
+```
+
+
+```{r}
+
+# untransformed data: QQPlot  
+qqnorm(resid(chl.full.A))
+```
+
+
+```{r}
+
+# log-transformed data
+# this will be used in the next steps when we look at it as log-transformed data.
+log.chl <- log(functional.phase.data$Chlorophyll)
+glimpse(log.chl)
+```
+
+
+```{r}
+
+# drought column result: (F-stat) 0.5701, (p-val) 0.4732
+
+chl.full.B = lmer(log.chl ~ Treatment + 
+                    (1|ID) + 
+                    (1|Population) + 
+                    (1|Week) + 
+                    (1|Population:Treatment) +  
+                    (1|Treatment:Week), 
+                  data = functional.phase.data, 
+                  na.action = na.omit)
+
+Anova(chl.full.B, test.statistic="F", type=3)
+```
+
+
+```{r}
+
+# transformed data: QQPlot 
+qqnorm(resid(chl.full.B))
+```
+
+
+## Reduced Models  
+
+- work bottom to top approach  
+- drop the interaction  
+- keep main factors  
+- always keep “Treatment” and “(1|ID)” in all models  
+- our goal is to find out if any of these factors improve model fit →   
+- does it account for more of the variance in our response trait?  
+- if it doesn’t, the chi square value will NOT be significant.  
+- the factor we drop from the reduced model is the factor of focus. We want to know if adding this factor accounts for MORE variance than the treatment alone. A.K.A. we are investigating the effect of the factor we drop.  
+
+```{r}
+
+# 1: (Population:Treatment): chisq 6.5799
+
+chl.red.1 = lmer(Chlorophyll ~ Treatment + 
+                   (1|ID) + 
+                   (1|Population) + 
+                   (1|Week) + 
+                   (1|Population:Treatment), 
+                 data = functional.phase.data, 
+                 na.action = na.omit)
+Anova(chl.red.1)
+```
+
+
+```{r}
+
+# 2: (Treatment:Time): chisq 4.1081
+
+chl.red.2 = lmer(Chlorophyll ~ Treatment + 
+                   (1|ID) + 
+                   (1|Population) + 
+                   (1|Week) + 
+                   (1|Treatment:Week), 
+                 data = functional.phase.data,  
+                 na.action = na.omit)
+Anova(chl.red.2)
+```
+
+
+```{r}
+
+# 3: no interactions: chisq 6.58
+
+chl.red.3 = lmer(Chlorophyll ~ Treatment + 
+                     (1|ID) + 
+                     (1|Population) + 
+                     (1|Week), 
+                   data = functional.phase.data, 
+                   na.action = na.omit)
+Anova(chl.red.3)
+```
+
+
+```{r}
+
+# 4: effect of week: chisq 6.0626
+
+chl.red.4 = lmer(Chlorophyll ~ Treatment + 
+                     (1|ID) + 
+                     (1|Population), 
+                   data = functional.phase.data, 
+                   na.action = na.omit)
+Anova(chl.red.4)
+```
+
+
+```{r}
+
+# 5: effect of population: chisq 5.4025
+
+chl.red.5 = lmer(Chlorophyll ~ Treatment + 
+                         (1|ID) + 
+                         (1|Week), 
+                       data = functional.phase.data, 
+                       na.action = na.omit)
+Anova(chl.red.5)
+```
+
+
+## Comparison Models  
+- the question: does adding the interaction/factors improve the model fit?
+- comp.model.1 = anova(full.model, red.model.1) # test treatment x time interaction  
+- comp.model.2 = anova(full.model, red.model.2) # test treatment x population interaction  
+- comp.model.3 = anova(red.model.3, red.model.4) # test effect of week  
+- comp.model.4= anova(red.model.3, red.model.5) # test effect of population   
+
+```{r}
+
+# 1: Test (treatment:time) interaction: chisq 2.8486
+anova(chl.full.A, chl.red.1)
+```
+
+
+```{r}
+
+# 2: Test (treatment:population) interaction: chisq 0
+anova(chl.full.A, chl.red.2)
+```
+
+
+```{r}
+
+# 3: Test the effect of week: chisq 1.226
+anova(chl.red.3, chl.red.4)
+```
+
+
+```{r}
+
+# 4: Test the effect of population: chisq 26.032
+anova(chl.red.3, chl.red.5)
+```
+
+
+
