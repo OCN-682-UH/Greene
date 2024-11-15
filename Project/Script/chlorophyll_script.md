@@ -8,6 +8,7 @@ Kauanoe Greene
 ``` r
 # visuals
 library(tidyverse)
+library(dplyr)
 library(tidytext)
 library(here)
 
@@ -43,6 +44,10 @@ glimpse(functional.phase.data)
     ## $ NPQmax      <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
     ## $ `Fv/Fm`     <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
     ## $ Phase       <chr> "Treatment", "Treatment", "Treatment", "Treatment", "Treat…
+
+``` r
+view(functional.phase.data)
+```
 
 # Statistic Modeling: Chlorophyll Content Data
 
@@ -285,7 +290,7 @@ anova(chl.full.A, chl.red.1)
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 ``` r
-# 2: Test (treatment:population) interaction: chisq 0
+# 2A: Test (treatment:population) interaction: chisq 0
 anova(chl.full.A, chl.red.2)
 ```
 
@@ -296,6 +301,19 @@ anova(chl.full.A, chl.red.2)
     ##            npar    AIC    BIC  logLik deviance Chisq Df Pr(>Chisq)
     ## chl.red.2     7 7440.6 7475.6 -3713.3   7426.6                    
     ## chl.full.A    8 7442.6 7482.6 -3713.3   7426.6     0  1          1
+
+``` r
+# 2B: Test (treatment:population) interaction: chisq 2.8486
+anova(chl.red.1, chl.red.2)
+```
+
+    ## Data: functional.phase.data
+    ## Models:
+    ## chl.red.1: Chlorophyll ~ Treatment + (1 | ID) + (1 | Population) + (1 | Week) + (1 | Population:Treatment)
+    ## chl.red.2: Chlorophyll ~ Treatment + (1 | ID) + (1 | Population) + (1 | Week) + (1 | Treatment:Week)
+    ##           npar    AIC    BIC  logLik deviance  Chisq Df Pr(>Chisq)
+    ## chl.red.1    7 7443.4 7478.5 -3714.7   7429.4                     
+    ## chl.red.2    7 7440.6 7475.6 -3713.3   7426.6 2.8486  0
 
 ``` r
 # 3: Test the effect of week: chisq 1.226
@@ -324,3 +342,141 @@ anova(chl.red.3, chl.red.5)
     ## chl.red.3    6 7441.4 7471.5 -3714.7   7429.4 26.032  1  3.358e-07 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+# Plot
+
+``` r
+# Data uploading
+functional.phase.data <- read_csv(here("Project", "Data", "functional.phase.data.csv"))
+glimpse(functional.phase.data)
+```
+
+    ## Rows: 1,107
+    ## Columns: 12
+    ## $ Week        <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…
+    ## $ Population  <chr> "Koko", "Koko", "Koko", "Koko", "Koko", "Koko", "Koko", "K…
+    ## $ ID          <chr> "K13A", "K14A", "K15A", "K16A", "K17A", "K18A", "K19A", "K…
+    ## $ Treatment   <chr> "C", "C", "C", "C", "C", "C", "C", "C", "C", "C", "C", "C"…
+    ## $ Conductance <dbl> 245.1, 266.1, 300.1, 274.6, 244.1, 226.2, 272.4, 196.2, 25…
+    ## $ Chlorophyll <dbl> 38.9, 26.5, 26.1, 35.2, 34.2, 32.9, 30.2, 26.3, 27.0, 32.0…
+    ## $ Alpha       <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+    ## $ ETRmax      <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+    ## $ Ek          <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+    ## $ NPQmax      <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+    ## $ `Fv/Fm`     <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+    ## $ Phase       <chr> "Treatment", "Treatment", "Treatment", "Treatment", "Treat…
+
+``` r
+view(functional.phase.data)
+```
+
+``` r
+# group control and treatment
+# group by phase
+# summarise mean
+
+glimpse(functional.phase.data)
+```
+
+    ## Rows: 1,107
+    ## Columns: 12
+    ## $ Week        <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…
+    ## $ Population  <chr> "Koko", "Koko", "Koko", "Koko", "Koko", "Koko", "Koko", "K…
+    ## $ ID          <chr> "K13A", "K14A", "K15A", "K16A", "K17A", "K18A", "K19A", "K…
+    ## $ Treatment   <chr> "C", "C", "C", "C", "C", "C", "C", "C", "C", "C", "C", "C"…
+    ## $ Conductance <dbl> 245.1, 266.1, 300.1, 274.6, 244.1, 226.2, 272.4, 196.2, 25…
+    ## $ Chlorophyll <dbl> 38.9, 26.5, 26.1, 35.2, 34.2, 32.9, 30.2, 26.3, 27.0, 32.0…
+    ## $ Alpha       <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+    ## $ ETRmax      <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+    ## $ Ek          <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+    ## $ NPQmax      <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+    ## $ `Fv/Fm`     <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+    ## $ Phase       <chr> "Treatment", "Treatment", "Treatment", "Treatment", "Treat…
+
+``` r
+mean_data <- functional.phase.data %>% 
+  select(Week, Population, Treatment, Chlorophyll, Conductance, ETRmax, Phase) %>% 
+  group_by(Week, Population, Treatment, Phase) %>% 
+  summarize(mean_chl = mean(Chlorophyll, na.rm = TRUE), 
+            mean_cond = mean(Conductance, na.rm = TRUE), 
+            mean_etrm = mean(ETRmax, na.rm = TRUE))
+
+view(mean_data)
+```
+
+``` r
+# Chlorophyll content over time
+
+chlplot <- mean_data %>% # datasheet
+  ggplot(aes(x = Week, # x-axis
+             y = mean_chl, # y-axis
+             color = Treatment)) + # colors
+  geom_point() +  # data points
+  geom_line() +  # plot
+  labs(subtitle = "Detecting intraspecific variation in plasticity of rates of chlorophyll content in response to drought stress", # plot subtitle
+       caption = "Data sourced from: Greene 2023", # plot caption
+       x = "Time (Weeks)", # x-axis label
+       y = "Mean Chlorophyll Content") + # y-axis label
+  ggtitle("Effects of Drought on Leaf Chlorophyll Content in 'A'ali'i") + # plot title
+  facet_wrap(~Population) + # create panels for each population!
+  scale_color_manual(breaks= c("C", "PD"), labels = c("Control Group", "Pulse Drought Group"), values = c("darkgreen", "brown")) + # rename legend variables
+  theme(plot.title = element_text(face = "bold", color = "black", hjust = 0.5), # bold title
+        axis.text.x = element_text(size = 8), axis.title.x = element_text(size = 10), # adjust x-axis labels
+        axis.text.y = element_text(size = 8), axis.title.y = element_text(size = 10),   # adjust y-axis labels
+        legend.position = "top", 
+        plot.subtitle = element_text(size = 10, hjust = 0.5), 
+        legend.title = element_blank())
+
+# save plot to my output folder
+ggsave(here("Project", "Output", "chlplot.png")) 
+
+# view plot
+chlplot
+```
+
+![](../Output/unnamed-chunk-21-1.png)<!-- -->
+
+``` r
+# group by phases
+
+phase_data <- functional.phase.data %>% 
+  select(Week, Population, Treatment, Chlorophyll, Conductance, ETRmax, Phase) %>% 
+  group_by(Population, Treatment, Phase) %>% 
+  summarize(mean_chl = mean(Chlorophyll, na.rm = TRUE), 
+            mean_cond = mean(Conductance, na.rm = TRUE), 
+            mean_etrm = mean(ETRmax, na.rm = TRUE))
+
+view(phase_data)
+```
+
+``` r
+# plot recovery phases
+
+chlphase_plot <- phase_data %>% # datasheet
+  ggplot(aes(x = Phase, # x-axis
+             y = mean_chl, # y-axis
+             color = Treatment)) + # colors
+  geom_point() +  # data points # plot
+  labs(subtitle = "Investigating the priming effects of drought treatment on rates of chlorophyll content throughout recovery phases", # plot subtitle
+       caption = "Data sourced from: Greene 2023", # plot caption
+       x = "Recovery Phase", # x-axis label
+       y = "Mean Chlorophyll Content") + # y-axis label
+  ggtitle("Drought Priming Effect on Leaf Chlorophyll Content in 'A'ali'i") + # plot title
+  facet_wrap(~Population) + # create panels for each population!
+  scale_color_manual(breaks= c("C", "PD"), labels = c("Control Group", "Pulse Drought Group"), values = c("darkgreen", "brown")) + # rename legend variables
+  scale_x_discrete(labels = c('Treatment', 'Pre', 'Mid', 'Post')) +
+theme(plot.title = element_text(face = "bold", color = "black", hjust = 0.5), # bold title
+        axis.text.x = element_text(size = 8), axis.title.x = element_text(size = 10), # adjust x-axis labels
+        axis.text.y = element_text(size = 8), axis.title.y = element_text(size = 10),   # adjust y-axis labels
+        legend.position = "top", 
+        plot.subtitle = element_text(size = 10, hjust = 0.5), 
+        legend.title = element_blank())
+
+# save plot to my output folder
+ggsave(here("Project", "Output", "chlphase_plot.png")) 
+
+# view plot
+chlphase_plot
+```
+
+![](../Output/unnamed-chunk-23-1.png)<!-- -->

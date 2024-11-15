@@ -18,6 +18,7 @@ knitr::opts_chunk$set(echo = TRUE,
 
 # visuals
 library(tidyverse)
+library(dplyr)
 library(tidytext)
 library(here)
 
@@ -38,6 +39,7 @@ library(nlme)
 # Data uploading
 functional.phase.data <- read_csv(here("Project", "Data", "functional.phase.data.csv"))
 glimpse(functional.phase.data)
+view(functional.phase.data)
 ```
 
 # Statistic Modeling: Chlorophyll Content Data  
@@ -216,8 +218,13 @@ anova(chl.full.A, chl.red.1)
 
 ```{r}
 
-# 2: Test (treatment:population) interaction: chisq 0
+# 2A: Test (treatment:population) interaction: chisq 0
 anova(chl.full.A, chl.red.2)
+```
+
+```{r}
+# 2B: Test (treatment:population) interaction: chisq 2.8486
+anova(chl.red.1, chl.red.2)
 ```
 
 
@@ -232,6 +239,111 @@ anova(chl.red.3, chl.red.4)
 
 # 4: Test the effect of population: chisq 26.032
 anova(chl.red.3, chl.red.5)
+```
+
+# Plot  
+
+```{r}
+# Data uploading
+functional.phase.data <- read_csv(here("Project", "Data", "functional.phase.data.csv"))
+glimpse(functional.phase.data)
+view(functional.phase.data)
+```
+
+
+```{r}
+
+# group control and treatment
+# group by phase
+# summarise mean
+
+glimpse(functional.phase.data)
+
+mean_data <- functional.phase.data %>% 
+  select(Week, Population, Treatment, Chlorophyll, Conductance, ETRmax, Phase) %>% 
+  group_by(Week, Population, Treatment, Phase) %>% 
+  summarize(mean_chl = mean(Chlorophyll, na.rm = TRUE), 
+            mean_cond = mean(Conductance, na.rm = TRUE), 
+            mean_etrm = mean(ETRmax, na.rm = TRUE))
+
+view(mean_data)
+```
+
+
+```{r}
+# Chlorophyll content over time
+
+chlplot <- mean_data %>% # datasheet
+  ggplot(aes(x = Week, # x-axis
+             y = mean_chl, # y-axis
+             color = Treatment)) + # colors
+  geom_point() +  # data points
+  geom_line() +  # plot
+  labs(subtitle = "Detecting intraspecific variation in plasticity of rates of chlorophyll content in response to drought stress", # plot subtitle
+       caption = "Data sourced from: Greene 2023", # plot caption
+       x = "Time (Weeks)", # x-axis label
+       y = "Mean Chlorophyll Content") + # y-axis label
+  ggtitle("Effects of Drought on Leaf Chlorophyll Content in 'A'ali'i") + # plot title
+  facet_wrap(~Population) + # create panels for each population!
+  scale_color_manual(breaks= c("C", "PD"), labels = c("Control Group", "Pulse Drought Group"), values = c("darkgreen", "brown")) + # rename legend variables
+  theme(plot.title = element_text(face = "bold", color = "black", hjust = 0.5), # bold title
+        axis.text.x = element_text(size = 8), axis.title.x = element_text(size = 10), # adjust x-axis labels
+        axis.text.y = element_text(size = 8), axis.title.y = element_text(size = 10),   # adjust y-axis labels
+        legend.position = "top", 
+        plot.subtitle = element_text(size = 10, hjust = 0.5), 
+        legend.title = element_blank())
+
+# save plot to my output folder
+ggsave(here("Project", "Output", "chlplot.png")) 
+
+# view plot
+chlplot
+```
+
+```{r}
+# group by phases
+
+phase_data <- functional.phase.data %>% 
+  select(Week, Population, Treatment, Chlorophyll, Conductance, ETRmax, Phase) %>% 
+  group_by(Population, Treatment, Phase) %>% 
+  summarize(mean_chl = mean(Chlorophyll, na.rm = TRUE), 
+            mean_cond = mean(Conductance, na.rm = TRUE), 
+            mean_etrm = mean(ETRmax, na.rm = TRUE))
+
+view(phase_data)
+```
+
+
+```{r}
+
+# plot recovery phases
+
+chlphase_plot <- phase_data %>% # datasheet
+  ggplot(aes(x = Phase, # x-axis
+             y = mean_chl, # y-axis
+             color = Treatment)) + # colors
+  geom_point() +  # data points # plot
+  labs(subtitle = "Investigating the priming effects of drought treatment on rates of chlorophyll content throughout recovery phases", # plot subtitle
+       caption = "Data sourced from: Greene 2023", # plot caption
+       x = "Recovery Phase", # x-axis label
+       y = "Mean Chlorophyll Content") + # y-axis label
+  ggtitle("Drought Priming Effect on Leaf Chlorophyll Content in 'A'ali'i") + # plot title
+  facet_wrap(~Population) + # create panels for each population!
+  scale_color_manual(breaks= c("C", "PD"), labels = c("Control Group", "Pulse Drought Group"), values = c("darkgreen", "brown")) + # rename legend variables
+  scale_x_discrete(labels = c('Treatment', 'Pre', 'Mid', 'Post')) +
+theme(plot.title = element_text(face = "bold", color = "black", hjust = 0.5), # bold title
+        axis.text.x = element_text(size = 8), axis.title.x = element_text(size = 10), # adjust x-axis labels
+        axis.text.y = element_text(size = 8), axis.title.y = element_text(size = 10),   # adjust y-axis labels
+        legend.position = "top", 
+        plot.subtitle = element_text(size = 10, hjust = 0.5), 
+        legend.title = element_blank())
+
+# save plot to my output folder
+ggsave(here("Project", "Output", "chlphase_plot.png")) 
+
+# view plot
+chlphase_plot
+
 ```
 
 

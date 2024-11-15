@@ -1,0 +1,87 @@
+---
+title: "Conductance"
+author: "Kauanoe Greene"
+date: "2024-11-15"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE, 
+                      fig.path = "../Output/")
+```
+
+
+# Libraries  
+
+```{r}
+
+# visuals
+library(tidyverse)
+library(dplyr)
+library(tidytext)
+library(here)
+
+# models (stats)
+library(lmerTest)
+library (RLRsim)
+library(Matrix)
+# library(lme4)
+library(lattice)
+library(car)
+library(nlme)
+
+```
+
+# Data  
+
+```{r}
+# Data uploading
+functional.phase.data <- read_csv(here("Project", "Data", "functional.phase.data.csv"))
+glimpse(functional.phase.data)
+```
+
+# Statistic Modeling: Chlorophyll Content Data  
+
+- PT.I: Primary interaction treatment  
+- PT.II: Reduced models  
+- PT.III: Comparison models  
+
+## PT.I: Full Model 
+- main interaction  
+- includes all main factors and interactions  
+- F-statistic for a fixed effects mixed model  
+- results table: drought column  
+
+```{r}
+
+# drought column result: (F-stat) 20.508, (p-val) 0.001138
+
+con.full.A = lmer(Conductance ~ Treatment + 
+                    (1|ID) + 
+                    (1|Population) + 
+                    (1|Week) + 
+                    (1|Population:Treatment) +  
+                    (1|Treatment:Week), 
+                  data = functional.phase.data, 
+                  na.action = na.omit)
+
+Anova(con.full.A, test.statistic="F", type=3)
+```
+
+```{r}
+# Normality check: untransformed data  
+# Checking normality of residuals in untransformed data
+# W = 0.98162, p-value = 1.319e-10
+
+shapiro.test(resid(chl.full.A)) 
+```
+
+```{r}
+
+```
+
+
+
+
