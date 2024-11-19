@@ -16,24 +16,33 @@ library(ggplot2)
 library(ggExtra)
 library(rsconnect)
 library(tidyverse)
+library(shinythemes)
 
-ui<-fluidPage(
-  sliderInput(inputId = "num", # ID name for the input
-              label = "Choose a number", # Label above the input
-              value = 25, min = 1, max = 100 # values for the slider
-  ),
-  plotOutput("hist") #creates space for a plot called hist  
-)
-server<-function(input,output){
+
+ui <- fluidPage(
+  sliderInput(inputId = "num", # input name: ID name for the input
+              label = "Select a value", # label: label to display for render
+              value = 50, min = 0, max = 100), # argument: values for the slider
+  textInput(inputId = "title", # new Id is title
+            label = "Create your own title",
+            value = "Histogram of Random Normal Values"), # starting title
+  plotOutput("hist"), # type of output # "_" name if output object! 
+  verbatimTextOutput("stats") # create a space for stats
+  )
+
+server <- function(input,output){
+  data<-reactive({ 
+    tibble(x = rnorm(input$num)) # 100 random normal points
+  }) 
   output$hist <- renderPlot({
-    # {} allows us to put all our R code in one nice chunck
-    data<-tibble(x = rnorm(100)) # 100 random normal points
-    ggplot(data, aes(x = x))+ # make a histogram
-      geom_histogram()
+    ggplot(data(), aes(x = x))+ # make a histogram
+      geom_histogram()+
+      labs(title = input$title) #Add a new title
+  })
+  output$stats <- renderPrint({
+    summary(data()) # calculate summary stats based on the numbers
   })
 }
-
-shinyApp(ui, server)
+shinyApp(ui = ui, server = server)
 
 deployApp()
-

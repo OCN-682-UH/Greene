@@ -267,6 +267,9 @@ mean_data <- functional.phase.data %>%
             mean_etrm = mean(ETRmax, na.rm = TRUE))
 
 view(mean_data)
+
+# save csv file to data folder
+write.csv(mean_data, here("Project", "Data", "mean_data.csv"))
 ```
 
 
@@ -279,7 +282,7 @@ chlplot <- mean_data %>% # datasheet
              color = Treatment)) + # colors
   geom_point() +  # data points
   geom_line() +  # plot
-  labs(subtitle = "Detecting intraspecific variation in plasticity of rates of chlorophyll content in response to drought stress", # plot subtitle
+  labs(subtitle = "Detecting trait plasticity of chlorophyll content in response to drought stress", # plot subtitle
        caption = "Data sourced from: Greene 2023", # plot caption
        x = "Time (Weeks)", # x-axis label
        y = "Mean Chlorophyll Content") + # y-axis label
