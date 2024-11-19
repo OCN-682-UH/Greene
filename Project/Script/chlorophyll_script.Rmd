@@ -323,6 +323,7 @@ chlphase_plot <- phase_data %>% # datasheet
              y = mean_chl, # y-axis
              color = Treatment)) + # colors
   geom_point() +  # data points # plot
+  geom_line(aes(group = Treatment)) +
   labs(subtitle = "Investigating the priming effects of drought treatment on rates of chlorophyll content throughout recovery phases", # plot subtitle
        caption = "Data sourced from: Greene 2023", # plot caption
        x = "Recovery Phase", # x-axis label

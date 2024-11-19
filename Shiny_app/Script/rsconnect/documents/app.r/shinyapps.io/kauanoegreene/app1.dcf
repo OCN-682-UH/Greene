@@ -1,0 +1,12 @@
+name: app1
+title: app1
+username: kauanoegreene
+account: kauanoegreene
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 13379283
+bundleId: 9382913
+url: https://kauanoegreene.shinyapps.io/app1/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
