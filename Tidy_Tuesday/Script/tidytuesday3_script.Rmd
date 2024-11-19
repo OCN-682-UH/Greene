@@ -1,0 +1,100 @@
+---
+title: "Tidy Tuesday!"
+author: "Kauanoe Greene"
+date: "2024-11-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+# Let us set up Rmarkdown file
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE, 
+                      fig.path = "../Output/")
+```
+
+# Libraries  
+
+```{r}
+
+# install.packages("ISOcodes")
+# install.packages("ggiraph")
+# install.packages("webshot")
+# install.packages("webshot2")
+
+library(here)
+library(ggiraph) # interactive plot
+library(ISOcodes)
+library(tidyverse)
+library(janitor) # clean data  
+```
+
+# Data Upload  
+
+
+```{r}
+
+# read in dataset 3 from github  
+former_countries <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2024/2024-11-12/former_countries.csv')
+glimpse(former_countries) # check it out  
+```
+
+
+# Data clean  
+
+```{r}
+
+# clean dataset 3 code from github to get us started  
+
+clean_former_countries <-
+  ISOcodes::ISO_3166_3 |> 
+  tibble::as_tibble() |> 
+  janitor::clean_names() %>% 
+  filter(date_withdrawn <= "1979") # filter by year
+glimpse(clean_former_countries)
+```
+
+# Plot  
+
+```{r}
+
+plot <- # plot name  
+  ggplot(
+  data = clean_former_countries, # dataset of choice
+  mapping = 
+    aes(
+    x = alpha_3, # x axis  
+    y = date_withdrawn, # y axis  
+    tooltip = name, data_id = name # interactive aesthetic  
+  )
+) +
+  geom_point_interactive(
+    size = 3, hover_nearest = TRUE # hover feature  
+  ) + 
+  labs(title = "Countries withdrawn in the 1970's", # plot title  
+       x = "Former Countries", # x axis title  
+       y = "Year Withdrawn") # y axis title  
+
+tidyplot3 <- girafe(ggobj = plot) # save interactive plot  
+htmltools::save_html(tidyplot3, "../Output/tidyplot3.html") # save as html  
+
+tidyplot3 # view interactive plot  
+
+```
+
+```{r}
+
+# save plot to my output folder
+ggsave(here("Tidy_Tuesday", "Output", "tidyplot3.png")) 
+
+# save csv file to data folder
+write.csv(clean_former_countries, here("Tidy_Tuesday", "Data", "tidydata3.csv"))
+
+# Tidy Tuesday Takeaways:  
+# learned how to make an interactive map!  
+# practiced filtering out more data 
+```
+
+
+ 

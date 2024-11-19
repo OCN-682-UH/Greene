@@ -7,50 +7,55 @@ library(bslib)
 library(dplyr)
 library(ggplot2)
 library(ggExtra)
+library(rsconnect)
 
 # Data upload
 
-df <- read_csv(here("Shiny", "Data", "mean_data.csv"))
-glimpse(df)
+df <- read_csv(here("Shiny", "Data", "mean_data.csv")) # read in data
+glimpse(df) # check it out  
 
-clean_df <- df %>% 
-  select(Week, Treatment, Population, mean_chl)
-glimpse(clean_df)
+clean_df <- df %>% # clean data  
+  select(Week, Treatment, Population, mean_chl) # select focal columns  
+glimpse(clean_df) # checkc it out  
 
 # Data
 
-ui <- page_sidebar(
-  sidebar = sidebar(
-    selectInput(
-      inputId = "select_population", 
-      label = "Select Population", 
-      choices = unique(clean_df$Population)
+ui <- page_sidebar( # page layout
+  sidebar = sidebar( # bar layout
+    selectInput( # input object  
+      inputId = "select_population", # input id name  
+      label = "Select Population", # label name  
+      choices = unique(clean_df$Population) # options  
     )
   ),
   mainPanel(
-  plotOutput("scatter")
+  plotOutput("scatter") # type of plot  
 )
 )
 
-server <- function(input, output, session) {
-  subsetted <- reactive({
-    clean_df |> filter(Population == input$select_population)
+server <- function(input, output, session) { # server object  
+  subsetted <- reactive({ # make it reactive  
+    clean_df |> filter(Population == input$select_population) # population data  
   })
   
-  output$scatter <- renderPlot({
-    plot <- ggplot(subsetted(), aes(x = Week, 
-                            y = mean_chl, 
-                            color = Treatment)) + 
-      geom_point() + 
-      geom_line() + 
-      labs(title = paste("Chlorophyll Content at", input$select_population), 
-           x = "Time (Week)", 
-           y = "Mean Chlorophyll Content", 
-           color = "Treatment") + 
-      theme(legend.position = "bottom")
+  output$scatter <- renderPlot({ # make plot  
+    plot <- ggplot(subsetted(), aes(x = Week, # x axis  
+                            y = mean_chl, # y axis  
+                            color = Treatment)) + # treatment will be differentiated by colors
+      geom_point() + # plot data points  
+      geom_line() + # connect points to see trends 
+      labs(title = paste("Chlorophyll Content of ʻAʻaliʻi from", input$select_population), # plot title  
+           x = "Time (Week)", # x axis title  
+           y = "Mean Chlorophyll Content", # y axis title  
+           color = "Treatment") + # legend title  
+      theme(legend.position = "bottom") # legend position  
     
-    plot + scale_color_manual(values = c("lightblue", "brown"))
+    plot + scale_color_manual(values = c("lightblue", "brown")) # manually set treatment colors  
   })
 }
 
-shinyApp(ui = ui, server = server)
+shinyApp(ui = ui, server = server) # shiny app 
+
+# publish shiny app!
+library(rsconnect)
+deployApp()
