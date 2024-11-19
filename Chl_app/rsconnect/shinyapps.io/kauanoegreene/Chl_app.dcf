@@ -1,0 +1,12 @@
+name: Chl_app
+title: Chl_app
+username: kauanoegreene
+account: kauanoegreene
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 13393996
+bundleId: 9388666
+url: https://kauanoegreene.shinyapps.io/Chl_app/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE

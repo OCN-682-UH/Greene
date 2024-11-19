@@ -4,19 +4,16 @@ library(shiny)
 library(tidyverse)
 library(here)
 library(bslib)
-library(dplyr)
-library(ggplot2)
 library(ggExtra)
 library(rsconnect)
 
 # Data upload
 
-df <- read_csv(here("Shiny", "Data", "mean_data.csv")) # read in data
-glimpse(df) # check it out  
+df <- read_csv(here("Data", "mean_data.csv")) # read in data
 
 clean_df <- df %>% # clean data  
   select(Week, Treatment, Population, mean_chl) # select focal columns  
-glimpse(clean_df) # checkc it out  
+ 
 
 # Data
 
@@ -57,5 +54,3 @@ server <- function(input, output, session) { # server object
 shinyApp(ui = ui, server = server) # shiny app 
 
 # publish shiny app!
-library(rsconnect)
-deployApp()
