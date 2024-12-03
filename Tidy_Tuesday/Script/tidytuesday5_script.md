@@ -36,11 +36,11 @@ mph <- A64_traffic %>% # dataset
             sd_mph = sd(`Avg mph`, na.rm = TRUE)) # calculate mean
 
 # expanded data summary
-time_mph <- A64_traffic %>% 
+time_mph <- A64_traffic %>% # data set  
   mutate(site = `Site Name`) %>% # modify column name
   select(`Avg mph`, `site`, `Time Period Ending`) %>% # focal columns  
   drop_na() %>% # drop the empty cells  
-  filter(site == "30361338")
+  filter(site == "30361338") # only select the data from this site  
 ```
 
 # Visual
@@ -49,7 +49,7 @@ time_mph <- A64_traffic %>%
 # data visual  
 # trying beeswarm function
 # plots individual points
-beeswarm(time_mph$`Avg mph`, horizontal = TRUE, 
+beeswarm(time_mph$`Avg mph`, horizontal = TRUE, # plot the data points of avg mph horizontally
          col = "brown", # modify dot color  
          cex = 0.7) # modify dot size  
 ```
