@@ -55,10 +55,10 @@ time_mph <- A64_traffic %>%
   filter(site == "30361338")
 ```
 
-# Plot
+# Visual  
 
 ```{r}
-# plot
+# data visual  
 # trying beeswarm function
 # plots individual points
 beeswarm(time_mph$`Avg mph`, horizontal = TRUE, 

@@ -43,10 +43,10 @@ time_mph <- A64_traffic %>%
   filter(site == "30361338")
 ```
 
-# Plot
+# Visual
 
 ``` r
-# plot
+# data visual  
 # trying beeswarm function
 # plots individual points
 beeswarm(time_mph$`Avg mph`, horizontal = TRUE, 
@@ -57,14 +57,11 @@ beeswarm(time_mph$`Avg mph`, horizontal = TRUE,
 ![](../Output/unnamed-chunk-4-1.png)<!-- -->
 
 ``` r
-# save plot to my output folder
-ggsave(here("Tidy_Tuesday", "Output", "tidyplot5.png")) 
-
-# save csv file to data folder
+# save csv file to data folder  
 write.csv(time_mph, here("Tidy_Tuesday", "Data", "tidydata5.csv"))
 
 # Tidy Tuesday Takeaways:  
-# learned how to make a plot using the beeswarm function (even though it does not seem very informative, haha)
+# Explored and discovered how to make a plot using the beeswarm function (even though it does not seem very informative in this visual, haha)
 # practiced filtering out more data 
 # practiced calculating summary stats
 # practiced cleaning column names using mutate function
