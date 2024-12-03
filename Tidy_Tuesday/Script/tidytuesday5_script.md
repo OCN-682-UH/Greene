@@ -1,22 +1,11 @@
----
-title: "Tidy Tuesday!"
-author: "Kauanoe Greene"
-date: "2024-12-03"
-output: github_document
----
-
-```{r setup, include=FALSE}
-
-# Let us set up Rmarkdown file
-knitr::opts_chunk$set(echo = TRUE, 
-                      message = FALSE, 
-                      warning = FALSE, 
-                      fig.path = "../Output/")
-```
+Tidy Tuesday!
+================
+Kauanoe Greene
+2024-12-03
 
 # Libraries
 
-```{r}
+``` r
 library(here)
 library(tidyverse)
 library(beeswarm)
@@ -26,16 +15,15 @@ library(viridis)
 
 # Data
 
-```{r}
+``` r
 # Data upload
 # straight from github
 A64_traffic <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2024/2024-12-03/A64_traffic.csv')
 ```
 
-# Data analyses  
+# Data analyses
 
-```{r}
-
+``` r
 # Data analyses  
 
 # check out stat summary
@@ -57,17 +45,18 @@ time_mph <- A64_traffic %>%
 
 # Plot
 
-```{r}
+``` r
 # plot
 # trying beeswarm function
 # plots individual points
 beeswarm(time_mph$`Avg mph`, horizontal = TRUE, 
          col = "brown", # modify dot color  
          cex = 0.7) # modify dot size  
-
 ```
 
-```{r}
+![](../Output/unnamed-chunk-4-1.png)<!-- -->
+
+``` r
 # save plot to my output folder
 ggsave(here("Tidy_Tuesday", "Output", "tidyplot5.png")) 
 
@@ -75,9 +64,8 @@ ggsave(here("Tidy_Tuesday", "Output", "tidyplot5.png"))
 write.csv(time_mph, here("Tidy_Tuesday", "Data", "tidydata5.csv"))
 
 # Tidy Tuesday Takeaways:  
-# Explored and discovered how to make a plot using the beeswarm function (even though it does not seem very informative in this visual, haha)
+# learned how to make a plot using the beeswarm function (even though it does not seem very informative, haha)
 # practiced filtering out more data 
 # practiced calculating summary stats
 # practiced cleaning column names using mutate function
 ```
-
