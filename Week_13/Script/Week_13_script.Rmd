@@ -1,0 +1,301 @@
+---
+title: "Week 13"
+author: "Kauanoe Greene"
+date: "2024-12-03"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+
+# Let us set up Rmarkdown file
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE, 
+                      fig.path = "../Output/")
+```
+
+# Libraries  
+
+```{r}
+library(tidyverse)
+library(here)
+```
+
+# For Loops  
+
+```{r}
+
+# one way to run an iterative process  
+# index in statement  
+# command looks like:
+# for( index in sequence) {command to repeat}
+
+```
+
+# Practice
+
+```{r}
+
+# simple for loop  
+
+print(paste("The year is", 2000))
+```
+
+```{r}
+
+# simple for loop  
+
+years<-c(2015:2021)
+for (i in years){ # set up the for loop where i is the index
+  print(paste("The year is", i)) # loop over i
+}
+```
+
+```{r}
+
+# simple for loop  
+
+# Pre-allocate space for the for loop
+# empty matrix that is as long as the years vector
+ year_data<-tibble(year =  rep(NA, length(years)),  # column name for year
+                   year_name = rep(NA, length(years))) # column name for the year name
+year_data
+
+```
+
+```{r}
+
+# simple for loop  
+
+for (i in 1:length(years)){ # set up the for loop where i is the index
+  year_data$year_name[i]<-paste("The year is", years[i]) # loop over i
+}
+year_data
+
+```
+
+```{r}
+
+# simple for loop  
+
+for (i in 1:length(years)){ # set up the for loop where i is the index
+  year_data$year_name[i]<-paste("The year is", years[i]) # loop over year name
+  year_data$year[i]<-years[i] # loop over year
+}
+year_data
+
+```
+
+# Data  
+
+```{r}
+
+# using loops to read in multiple .csv files  
+
+testdata<-read_csv(here("Week_13", "data", "cond_data","011521_CT316_1pcal.csv"))
+glimpse(testdata)
+
+```
+
+```{r}
+
+# list files in a directory  
+
+
+# point to the location on the computer of the folder
+CondPath<-here("Week_13", "data", "cond_data")
+# list all the files in that path with a specific pattern
+# In this case we are looking for everything that has a .csv in the filename
+# you can use regex to be more specific if you are looking for certain patterns in filenames
+files <- dir(path = CondPath,pattern = ".csv")
+files
+
+```
+
+
+```{r}
+
+# pre-allocate space for the loop  
+
+
+# make an empty dataframe that has one row for each file and 3 columns
+ cond_data<-tibble(filename =  rep(NA, length(files)),  # column name for year
+                   mean_temp = rep(NA, length(files)), # column name for the mean temperature
+                   mean_sal = rep(NA, length(files)), # column name for the mean salinity
+                   ) # column name for the year name
+cond_data
+
+
+```
+
+
+```{r}
+
+# for loop  
+
+raw_data<-read_csv(paste0(CondPath,"/",files[1])) # test by reading in the first file and see if it works
+head(raw_data)
+```
+
+```{r}
+
+# turn it into a for loop  
+
+for (i in 1:length(files)){ # loop over 1:3 the number of files
+}
+
+# add in the loop over the raw data  
+
+for (i in 1:length(files)){ # loop over 1:3 the number of files 
+raw_data<-read_csv(paste0(CondPath,"/",files[i]))
+glimpse(raw_data)
+}
+
+
+```
+
+```{r}
+
+# add in the columns  
+
+for (i in 1:length(files)){ # loop over 1:3 the number of files 
+raw_data<-read_csv(paste0(CondPath,"/",files[i]))
+#glimpse(raw_data)
+cond_data$filename[i]<-files[i]
+} 
+cond_data
+```
+
+```{r}
+
+# add in means  
+
+for (i in 1:length(files)){ # loop over 1:3 the number of files 
+raw_data<-read_csv(paste0(CondPath,"/",files[i]))
+#glimpse(raw_data)
+cond_data$filename[i]<-files[i]
+cond_data$mean_temp[i]<-mean(raw_data$Temperature, na.rm =TRUE)
+cond_data$mean_sal[i]<-mean(raw_data$Salinity, na.rm =TRUE)
+} 
+cond_data
+```
+
+# Map functions  
+
+```{r}
+
+# the pattern of looping over a vector.  
+
+# map() makes a list.
+# map_lgl() makes a logical vector.
+# map_int() makes an integer vector.
+# map_dbl() makes a double vector.
+# map_chr() makes a character vector.
+# map_df() makes a dataframe
+
+# Each function takes a vector as input, applies a function to each piece, and then returns a new vector that’s the same length (and has the same names) as the input.
+```
+
+
+```{r}
+# use a canned function that already exists
+
+
+1:10 %>% # a vector from 1 to 10 (we are going to do this 10 times) %>% # the vector to iterate over
+  map(rnorm, n = 15) # calculate 15 random numbers based on a normal distribution in a list
+```
+
+```{r}
+
+# calculate the mean from each list  
+
+1:10 %>% # a vector from 1 to 10 (we are going to do this 10 times) %>% # the vector to iterate over
+  map(rnorm, n = 15)  %>% # calculate 15 random numbers based on a normal distribution in a list 
+  map_dbl(mean) # calculate the mean. It is now a vector which is type "double"
+```
+
+```{r}
+
+# make your own function  
+
+1:10 %>% # list 1:10
+  map(function(x) rnorm(15, x)) %>% # make your own function
+  map_dbl(mean)
+```
+
+```{r}
+
+# Use a formula when you want to change the arguments within the function  
+
+1:10 %>%
+  map(~ rnorm(15, .x)) %>% # changes the arguments inside the function
+  map_dbl(mean)
+
+```
+
+
+```{r}
+
+# bring in files using purrr instead of a for loop 
+
+# point to the location on the computer of the folder
+
+CondPath<-here("Week_13", "data", "cond_data")
+files <- dir(path = CondPath,pattern = ".csv")
+files
+```
+
+```{r}
+
+# Or, we can get the full file names in one less step by doing this...  
+
+files <- dir(path = CondPath,pattern = ".csv", full.names = TRUE)
+#save the entire path name
+files
+```
+
+```{r}
+
+# read in the files  
+
+data<-files %>%
+  set_names()%>% # set's the id of each list to the file name
+  map_df(read_csv,.id = "filename") # map everything to a dataframe and put the id in a column called filename
+data
+
+
+```
+
+```{r}
+
+# calculate means  
+
+data<-files %>%
+  set_names()%>% # set's the id of each list to the file name
+  map_df(read_csv,.id = "filename") %>% # map everything to a dataframe and put the id in a column called filename
+  group_by(filename) %>%
+  summarise(mean_temp = mean(Temperature, na.rm = TRUE),
+            mean_sal = mean(Salinity,na.rm = TRUE))
+
+
+
+
+```
+
+```{r}
+
+# Homework  
+
+# You have a set of 4 .csv files in data/homework. Each of these files is a timeseries of temperature and light data collected in tide pools in Oregon by Jenn Fields. 
+# Your goal is to bring in all 4 files and calculate the mean and standard deviation of both temperature (Temp.C) and light (Intensity.lux) for each tide pool. 
+
+# Use both a for loop and map() functions in your script. (Basically, do it twice). Due Tuesday at 1pm.
+
+```
+
+# Homework  
+
+```{r}
+
+```
+
