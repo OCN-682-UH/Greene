@@ -1,0 +1,97 @@
+---
+output: 
+  cleanrmd::html_document_clean:
+    theme: markdown-splendor
+---
+
+::: {style="text-align: center; font-size: 25px; font-weight: bold; margin-top: 50px; margin-bottom: 50px"}
+Tidy Tuesday (6)
+:::
+
+::: {style="text-align: center; font-size: 25px; margin-top: 50px; margin-bottom: 50px"}
+Created by: Kauanoe Greene\
+2024-12-09\
+OCN-682
+:::
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, 
+                      message = FALSE, 
+                      warning = FALSE, 
+                      fig.path = "../Output/", 
+                      fig.align = "center")
+```
+
+```{r}
+# Libraries  
+library(tidyverse)
+library(dplyr)
+library(tidytext) # clean data
+library(here) # saving data
+library(cleanrmd) # html style
+library(janitor) # clean data  
+library(viridis) # color  
+```
+
+```{r}
+
+# Data upload
+# Data clean code straight from GitHub  
+
+cbp_resp <- bind_rows(
+  read_csv("https://www.cbp.gov/sites/default/files/assets/documents/2023-Nov/nationwide-encounters-fy20-fy23-aor.csv"),
+  read_csv("https://www.cbp.gov/sites/default/files/2024-10/nationwide-encounters-fy21-fy24-aor.csv")
+) |>
+  janitor::clean_names() |>
+  unique()
+
+cbp_state <- bind_rows(
+  read_csv("https://www.cbp.gov/sites/default/files/assets/documents/2023-Nov/nationwide-encounters-fy20-fy23-state.csv"),
+  read_csv("https://www.cbp.gov/sites/default/files/2024-10/nationwide-encounters-fy21-fy24-state.csv")
+) |>
+  janitor::clean_names() |>
+  unique()
+```
+::: {style="text-align: center; font-size: 25px; font-weight: bold; margin-top: 50px; margin-bottom: 50px"}
+Plotting tidy data
+:::
+
+::: {style="text-align: center; font-size: 25px; margin-top: 50px; margin-bottom: 50px"}
+Here is a scatterplot capturing the number of encounters each year from 2020-2024. I used this TidyTuesday assignment to practice new skills of formatting my document in an html document and modifying css styles. I also modified the basic scatter plot a bit with transparency, which I don't try often.  
+:::
+
+```{r}
+
+# clean data  
+
+encounters <- cbp_state %>% # data set
+  select(fiscal_year, encounter_count)
+
+# save csv file to data folder
+write.csv(encounters, here("Tidy_Tuesday", "Data", "tidydata6.csv"))
+  
+# plot data  
+
+encounters %>% 
+  ggplot(aes(
+    x= encounter_count, # x axis  
+    y= fiscal_year, # y axis  
+    fill = fiscal_year)) + # color fill treatment groups  
+  scale_color_viridis() +
+  geom_point(alpha = 0.5) + # adjust transparency of boxes
+  geom_jitter(alpha = 0.5) + # adjust transparency of points  
+    theme(
+      legend.position="none", # no legend  
+      plot.title = element_text(size=12, hjust = 0.5), # adjust title 
+      axis.title.x = element_text(size=10, hjust = 0.5), # adjust x axis text  
+      axis.title.y = element_text(size=10, hjust = 0.5), # adjust y axis text  
+      axis.text.x = element_text(size = 8), # adjust x axis text
+      axis.text.y = element_text(size = 8))+ # adjust y axis text
+   labs(
+     title = "Encounters 2020-2024", # title  
+     x = "Number of Encounters", # x axis  
+     y = "Fiscal Year")# y axis  
+  
+```
+
+
